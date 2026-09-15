@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COI Sergipe</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230b5394'%3E%3Cpath d='M13 2 4 14h7l-1 8 9-12h-7l1-8z'/%3E%3C/svg%3E">
+
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/callback-whatsapp.css">
+<link rel="stylesheet" href="css/auth.css">
+<link rel="stylesheet" href="css/admin.css">
+<link rel="stylesheet" href="css/equipes.css">
+<link rel="stylesheet" href="css/mapa.css">
+<!-- MAPAS DAS REGIONAIS: módulo novo e independente (não reaproveita
+     classes de css/mapa.css) — ver css/mapas-regionais.css. -->
+<link rel="stylesheet" href="css/mapas-regionais.css">
+<!-- PENDÊNCIAS (Fase 3, etapa 4): módulo novo e independente, compartilhado
+     por polo — não reaproveita classes de css/equipes.css nem css/mapa.css.
+     Ver css/pendencias.css / js/pendencias.js. -->
+<link rel="stylesheet" href="css/pendencias.css">
+<!-- PASSAGEM DE TURNO (Fase 4, etapa 4): módulo novo e independente,
+     compartilhado por polo (mesma lógica de Pendências) — substitui o
+     Microsoft Forms usado até aqui. Ver css/passagem-turno.css /
+     js/passagem-turno.js. -->
+<link rel="stylesheet" href="css/passagem-turno.css">
+<!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup
+     (Bloqueio LV, e futuramente Trafo/Poste/Sinergia/Desarme/SS) — ver
+     css/scripts-campo.css. -->
+<link rel="stylesheet" href="css/scripts-campo.css">
+<!-- MAPA OPERACIONAL: Leaflet via CDN (sem bundler/build no projeto — mesmo
+     motivo pelo qual não há empacotador para os demais scripts). Só é usado
+     dentro da aba "Mapa Operacional"; se o CDN estiver inacessível, o
+     restante do sistema (Equipes, Callback, etc.) continua funcionando
+     normalmente — ver mapaVerificarLeafletDisponivel() em js/mapa.js. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+
+<div id="toast">Texto copiado com sucesso!</div>
+
+<!-- ===== TELA DE LOGIN (etapa 6) ===== -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="coi-wordmark coi-wordmark--lg" role="img" aria-label="COI Sergipe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+      <span class="coi-wordmark-texto">COI<span>SERGIPE</span></span>
+    </div>
+    <p class="login-titulo">Centro de Operação Integrado</p>
+
+    <!-- LOGIN -->
+    <div id="login-view-login" class="login-view ativo">
+      <label for="login_campo_login">Login</label>
+      <input id="login_campo_login" autocomplete="username">
+
+      <label for="login_campo_senha">Senha</label>
+      <input id="login_campo_senha" type="password" autocomplete="current-password">
+
+      <button type="button" id="login_btn_entrar">ENTRAR</button>
+      <div class="login-erro" id="login_erro"></div>
+      <div class="login-sucesso" id="login_sucesso"></div>
+
+      <div class="login-links">
+        <a onclick="authMostrarView('acesso')">Solicitar criação de acesso</a>
+        <a onclick="authMostrarView('esqueci')">Esqueci minha senha</a>
+      </div>
+    </div>
+
+    <!-- SOLICITAR CRIAÇÃO DE ACESSO -->
+    <div id="login-view-acesso" class="login-view">
+      <label for="acesso_nome">Nome completo</label>
+      <input id="acesso_nome">
+
+      <label for="acesso_login">Login desejado</label>
+      <input id="acesso_login">
+
+      <label for="acesso_matricula">Matrícula (opcional)</label>
+      <input id="acesso_matricula">
+
+      <label for="acesso_email">E-mail corporativo</label>
+      <input id="acesso_email" type="email" autocomplete="email">
+
+      <label for="acesso_whatsapp">Telefone/WhatsApp</label>
+      <input id="acesso_whatsapp" autocomplete="tel">
+
+      <label for="acesso_senha">Senha</label>
+      <input id="acesso_senha" type="password" autocomplete="new-password">
+
+      <label for="acesso_senha_confirmar">Confirmar senha</label>
+      <input id="acesso_senha_confirmar" type="password" autocomplete="new-password">
+
+      <label for="acesso_justificativa">Justificativa</label>
+      <textarea id="acesso_justificativa" rows="3"></textarea>
+
+      <button type="button" id="acesso_btn_enviar">SOLICITAR ACESSO</button>
+      <div class="login-erro" id="acesso_erro"></div>
+      <div class="login-sucesso" id="acesso_sucesso"></div>
+
+      <span class="login-voltar" onclick="authMostrarView('login')">&larr; Voltar para o login</span>
+    </div>
+
+    <!-- ESQUECI MINHA SENHA -->
+    <div id="login-view-esqueci" class="login-view">
+      <label for="esqueci_login">Login ou e-mail</label>
+      <input id="esqueci_login">
+
+      <button type="button" id="esqueci_btn_enviar">ENVIAR E-MAIL DE REDEFINIÇÃO</button>
+      <div class="login-sucesso" id="esqueci_sucesso"></div>
+
+      <span class="login-voltar" onclick="authMostrarView('login')">&larr; Voltar para o login</span>
+      <br>
+      <span class="login-voltar" onclick="authMostrarView('redefinir')">Já tenho um código de redefinição</span>
+    </div>
+
+    <!-- DEFINIR NOVA SENHA (código recebido por e-mail — o link do e-mail já
+         abre esta tela com o código preenchido via ?reset_token=..., ver
+         authAplicarTokenDaUrl em js/auth.js) -->
+    <div id="login-view-redefinir" class="login-view">
+      <label for="redefinir_token">Código de redefinição</label>
+      <input id="redefinir_token">
+
+      <label for="redefinir_senha">Nova senha</label>
+      <input id="redefinir_senha" type="password">
+
+      <label for="redefinir_senha_confirmar">Confirmar nova senha</label>
+      <input id="redefinir_senha_confirmar" type="password">
+
+      <button type="button" id="redefinir_btn_enviar">DEFINIR NOVA SENHA</button>
+      <div class="login-erro" id="redefinir_erro"></div>
+      <div class="login-sucesso" id="redefinir_sucesso"></div>
+
+      <span class="login-voltar" onclick="authMostrarView('login')">&larr; Voltar para o login</span>
+    </div>
+
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
+
+  <div class="sidebar-header coi-header">
+    <div class="coi-wordmark" role="img" aria-label="COI Sergipe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+      <span class="coi-wordmark-texto">COI<span>SERGIPE</span></span>
+    </div>
+    <div class="coi-sub">Centro de Operação Integrado</div>
+</div>
+
+
+<div class="menu">
+
+  <!-- ===== OPERAÇÃO ===== -->
+  <div class="menu-categoria" data-categoria="operacao">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      <span class="menu-cat-label">Operação</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <button onclick="openModule('equipes', this); equipesAoAbrir();">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="menu-label">Gestão de Equipes</span>
+        </button>
+        <!-- Item antigo "Mapa Regionais" (galeria de imagens estáticas,
+             módulo #mapas_regionais) removido do menu — substituído por este
+             módulo interativo. O HTML do módulo antigo (#mapas_regionais)
+             permanece no arquivo por enquanto, só sem nenhum botão de menu
+             apontando pra ele; nenhuma limpeza/remoção de código nesta etapa. -->
+        <button onclick="openModule('mapas_territoriais', this); regtmAoAbrir();">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/><circle cx="12" cy="9" r="2"/></svg>
+          <span class="menu-label">Mapas das Regionais</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS =====
+       Regra arquitetural (Fase 1 — só documentada, nada implementado
+       ainda): os 6 módulos abaixo são PRIVADOS POR OPERADOR. O
+       preenchimento de um operador nunca deve ficar visível para outro,
+       e o rascunho de cada script deverá futuramente sobreviver a
+       F5/fechamento do navegador/reinício da máquina permanecendo
+       privado daquele operador. Estratégia de persistência ainda NÃO
+       implementada nesta fase — ver scripts-campo/* (protegido). -->
+  <div class="menu-categoria" data-categoria="scripts">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      <span class="menu-cat-label">Scripts</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <button onclick="openModule('bloqueios_lv', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span class="menu-label">Bloqueio – Linha Viva</span>
+        </button>
+        <button onclick="openModule('sinergia', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="menu-label">Script Mais Sinergia</span>
+        </button>
+        <button onclick="openModule('desarme', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span class="menu-label">Script Desarme</span>
+        </button>
+        <button onclick="openModule('preenchimento_ss', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span class="menu-label">Preenchimento de SS</span>
+        </button>
+        <button onclick="openModule('substituicao_poste', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M5 8h14M5 8a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v1a2 2 0 0 1-2 2"/><path d="M8 22h8"/></svg>
+          <span class="menu-label">Substituição de Poste</span>
+        </button>
+        <button onclick="openModule('substituicao_transformador', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="2" ry="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="12" y1="11" x2="12" y2="15"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
+          <span class="menu-label">Substituição de Transformador</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PENDÊNCIAS =====
+       Fase 3, etapa 4: módulo funcional (etapas 1-3 fizeram só a estrutura
+       de menu, depois o banco/API). COMPARTILHADA por polo (mesma lógica
+       de Gestão de Equipes), ao contrário dos Scripts. Os 3 itens abrem o
+       MESMO módulo (#pendencias), só pré-selecionando a subaba — ver
+       pendenciasAoAbrir() em js/pendencias.js. -->
+  <div class="menu-categoria" data-categoria="pendencias">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span class="menu-cat-label">Pendências</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <button onclick="abrirEmDesenvolvimento('Todas as Pendências', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span class="menu-label">Todas as Pendências</span>
+        </button>
+        <button onclick="abrirEmDesenvolvimento('Pendências Comerciais', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span class="menu-label">Pendências Comerciais</span>
+        </button>
+        <button onclick="abrirEmDesenvolvimento('Pendências Técnicas', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          <span class="menu-label">Pendências Técnicas</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ATENDIMENTO ===== -->
+  <div class="menu-categoria" data-categoria="atendimento">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span class="menu-cat-label">Atendimento</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <button onclick="openModule('callback',this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span class="menu-label">Callback WhatsApp</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== UTILITÁRIO COI ===== -->
+  <div class="menu-categoria" data-categoria="utilitario">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="menu-cat-label">Utilitário COI</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <!-- VERSÃO DEMONSTRATIVA: a imagem original (mapas/mapa_empreiteiras.jpg)
+             continha protocolo operacional real de acionamento de
+             empreiteiras — deletada desta cópia. Ver abrirMaterialRemovido()
+             em js/core.js. -->
+        <button onclick="abrirMaterialRemovido(this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span class="menu-label">Mapa de Empreiteira</span>
+        </button>
+        <button onclick="abrirTabela()">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          <span class="menu-label">Tabelas Técnicas</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== GESTÃO ===== -->
+  <div class="menu-categoria" data-categoria="gestao">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="menu-cat-label">Gestão</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <button onclick="abrirEmDesenvolvimento('Passagem de Turno', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
+          <span class="menu-label">Passagem de Turno</span>
+        </button>
+        <!-- VERSÃO DEMONSTRATIVA: sempre visível (não há mais gate por perfil
+             real), leva ao placeholder "Em desenvolvimento" — ver
+             abrirEmDesenvolvimento() em js/core.js. -->
+        <button id="menu_item_pt_historico" onclick="abrirEmDesenvolvimento('Histórico de Passagens', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+          <span class="menu-label">Histórico de Passagens</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FERRAMENTAS — reservado para futuras ferramentas (Fase 1: vazio) ===== -->
+  <div class="menu-categoria" data-categoria="ferramentas">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span class="menu-cat-label">Ferramentas</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <div class="menu-categoria-vazio">Nenhuma ferramenta cadastrada ainda.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERSÃO DEMONSTRATIVA: categoria sempre visível (não há mais gate por
+       perfil real vindo de um backend), leva ao placeholder "Em
+       desenvolvimento" — administração de usuários reais não existe nesta
+       demo. Ver abrirEmDesenvolvimento() em js/core.js. -->
+  <div class="menu-categoria" id="menu_categoria_admin" data-categoria="administracao">
+    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span class="menu-cat-label">Administração</span>
+      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    <div class="menu-categoria-itens-wrap">
+      <div class="menu-categoria-itens">
+        <button onclick="abrirEmDesenvolvimento('Administração', this)">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span class="menu-label">Administração</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="sidebar-footer premium-footer">
+    <div class="status-indicator"></div>
+
+    <div class="system-info">
+        <div class="status-line">
+            <span class="status-text">ONLINE</span>
+            <span class="status-dot"></span>
+        </div>
+
+        <div class="system-name">COI OPERACIONAL</div>
+        <div class="system-time" id="dataHoraSistema"></div>
+    </div>
+</div>
+
+
+</div>
+
+
+<!-- ===== CONTENT ===== -->
+<div class="content">
+
+  <!-- ===== INÍCIO ===== -->
+  <div id="inicio" class="module active">
+    <div class="container">
+      <h2>Bem-vindo ao Sistema COI</h2>
+      <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
+        Centro de Operação Integrado — selecione uma ferramenta no menu ao lado.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== EM DESENVOLVIMENTO (VERSÃO DEMONSTRATIVA) =====
+       Placeholder único para todo módulo pausado nesta demo (Pendências,
+       Passagem de Turno, Histórico de Passagens, Administração) — ver
+       abrirEmDesenvolvimento() em js/core.js. Abrir estes itens NUNCA chama
+       o código original do módulo (pendenciasAoAbrir, passagemTurnoAoAbrir,
+       pthAoAbrir, adminCarregarDashboard) nem faz qualquer chamada de rede;
+       os arquivos originais permanecem intactos no projeto para reativação
+       futura, só não são executados a partir daqui. -->
+  <div id="em_desenvolvimento" class="module">
+    <div class="container">
+      <h2>Em desenvolvimento</h2>
+      <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
+        O módulo "<span id="em_dev_nome">Este recurso</span>" não está disponível nesta versão demonstrativa
+        (depende de backend/banco de dados, que a demo não usa).
+      </p>
+    </div>
+  </div>
+
+  <!-- ===== MATERIAL OPERACIONAL REMOVIDO (VERSÃO DEMONSTRATIVA) =====
+       As imagens originais (mapas/mapa1.jpg a mapa5.jpg e
+       mapas/mapa_empreiteiras.jpg) continham dados operacionais internos
+       reais (códigos de despacho por município, protocolo de acionamento
+       de empreiteiras) e foram DELETADAS desta cópia por segurança — nunca
+       substituídas por versão editada/borrada. Ver abrirMaterialRemovido()
+       em js/core.js. -->
+  <div id="material_removido" class="module">
+    <div class="container">
+      <h2>Material operacional interno removido da versão demonstrativa.</h2>
+      <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
+        Este item exibia um material com informações operacionais internas reais e foi
+        removido desta cópia pública por segurança.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- =====///////////////// CAMPO / OPERAÇÃO: BLOQUEIO LINHA VIVA /////////////////// =====
+       Reintegrado do backup scriptdebloqueioslinhaviva-v2 (js/bloqueios.js,
+       módulo #rel) — ver auditoria. Mesmos campos/rótulos/opções do
+       original, só com ids prefixados "blv_" e módulo renomeado para
+       "bloqueios_lv" (mais descritivo que o "#rel" antigo). Nenhuma
+       regra de negócio alterada. -->
+  <div id="bloqueios_lv" class="module">
+    <div class="container">
+      <h2>Script Bloqueio – Linha Viva</h2>
+
+      <div class="linha-4-rel">
+        <div>
+          <label for="blv_responsavel">Responsável:</label>
+          <input id="blv_responsavel">
+        </div>
+        <div>
+          <label for="blv_equipe">Equipe:</label>
+          <input id="blv_equipe">
+        </div>
+        <div>
+          <label for="blv_contato">Contato:</label>
+          <input id="blv_contato">
+        </div>
+        <div>
+          <label for="blv_viatura">Viatura:</label>
+          <input id="blv_viatura">
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="blv_radio">Rádio:</label>
+          <select id="blv_radio">
+            <option>Sim</option>
+            <option>Não</option>
+          </select>
+        </div>
+        <div>
+          <label for="blv_teste_radio">Teste Rádio?</label>
+          <select id="blv_teste_radio">
+            <option>Sim</option>
+            <option>Não</option>
+          </select>
+        </div>
+        <div>
+          <label for="blv_referencia">Referência Elétrica:</label>
+          <input id="blv_referencia">
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="blv_tipo_condutor">Tipo de Condutor</label>
+          <select id="blv_tipo_condutor">
+            <option value="">Selecione</option>
+            <option>4 AWG C/ ALMA</option>
+            <option>4 AWG S/ ALMA</option>
+            <option>2 AWG</option>
+            <option>1/0</option>
+            <option>2/0 </option>
+            <option>4/0</option>
+            <option>336</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div>
+          <label for="blv_maresia">Área de Maresia?</label>
+          <select id="blv_maresia">
+            <option>Não</option>
+            <option>Sim</option>
+          </select>
+        </div>
+        <div>
+          <label for="blv_selfhealing">Self-healing?</label>
+          <select id="blv_selfhealing">
+            <option>Não</option>
+            <option>Sim</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="blv_desativou">Desativou Self-healing</label>
+          <select id="blv_desativou">
+            <option>Não</option>
+            <option>Sim</option>
+          </select>
+        </div>
+        <div>
+          <label for="blv_servico">Tipo do Serviço:</label>
+          <input id="blv_servico">
+        </div>
+        <div>
+          <label for="blv_obs">Observação:</label>
+          <input id="blv_obs">
+        </div>
+      </div>
+
+      <button onclick="blvGerarRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Gerar e Copiar</button>
+      <button class="sec" onclick="blvLimparRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Limpar</button>
+
+      <label for="blv_resultado">Relatório:</label>
+      <textarea id="blv_resultado" readonly></textarea>
+
+    </div>
+  </div>
+
+  <!-- =====///////////////// CAMPO / OPERAÇÃO: SCRIPT MAIS SINERGIA /////////////////// =====
+       Reintegrado do backup scriptdebloqueioslinhaviva-v2 (js/sinergia.js,
+       módulo #sinergia) — ver auditoria. Mesmos campos/rótulos/opções do
+       original, ids já vinham prefixados "sg_" desde o backup. Nenhuma
+       regra de negócio alterada. -->
+  <div id="sinergia" class="module">
+    <div class="container">
+      <h2>Script Mais Sinergia</h2>
+
+      <div>
+        <label for="sg_rd">RD</label>
+        <input id="sg_rd" placeholder="Ex: 001013587">
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="sg_tpbt">Religador conectado no TP ou BT?</label>
+          <select id="sg_tpbt">
+            <option value="">Selecione</option>
+            <option>TP</option>
+            <option>BT</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_ramal">Ramal de serviço e conexões</label>
+          <select id="sg_ramal">
+            <option value="">Selecione</option>
+            <option>OK</option>
+            <option>PROBLEMA</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_dps">DPS</label>
+          <select id="sg_dps">
+            <option value="">Selecione</option>
+            <option>ÍNTEGRO</option>
+            <option>DANIFICADO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="sg_tensao_ca">Tensão CA no disjuntor</label>
+          <select id="sg_tensao_ca">
+            <option value="">Selecione</option>
+            <option>OK</option>
+            <option>SEM TENSÃO</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_disj">Disjuntor armado</label>
+          <select id="sg_disj">
+            <option value="">Selecione</option>
+            <option>SIM</option>
+            <option>NÃO</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_alarme">Alarme bateria antes da perda</label>
+          <select id="sg_alarme">
+            <option value="">Selecione</option>
+            <option>SIM</option>
+            <option>NÃO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="sg_bateria">Tensão da bateria (V)</label>
+          <input id="sg_bateria" placeholder="Ex: 12.4">
+        </div>
+        <div>
+          <label for="sg_painel">Painel do religador</label>
+          <select id="sg_painel">
+            <option value="">Selecione</option>
+            <option>FUNCIONANDO</option>
+            <option>SEM FUNCIONAMENTO</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_modem">Modem / Rádio</label>
+          <select id="sg_modem">
+            <option value="">Selecione</option>
+            <option>LIGADO</option>
+            <option>DESLIGADO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="sg_antena">Antena GPRS / Rádio</label>
+          <select id="sg_antena">
+            <option value="">Selecione</option>
+            <option>INSTALADA</option>
+            <option>NÃO INSTALADA</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_curto">Sinais de curto-circuito</label>
+          <select id="sg_curto">
+            <option value="">Selecione</option>
+            <option>SIM</option>
+            <option>NÃO</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_tanque">Tanque</label>
+          <select id="sg_tanque">
+            <option value="">Selecione</option>
+            <option>OK</option>
+            <option>DETERIORADO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="sg_cubiculo">Cubículo</label>
+          <select id="sg_cubiculo">
+            <option value="">Selecione</option>
+            <option>OK</option>
+            <option>DETERIORADO</option>
+          </select>
+        </div>
+        <div>
+          <label for="sg_cordao">Cordão umbilical</label>
+          <select id="sg_cordao">
+            <option value="">Selecione</option>
+            <option>OK</option>
+            <option>DETERIORADO</option>
+          </select>
+        </div>
+      </div>
+
+      <button onclick="sgGerarRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Gerar e Copiar</button>
+      <button class="sec" onclick="sgLimparRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Limpar</button>
+
+      <label for="sg_resultado">Resultado:</label>
+      <textarea id="sg_resultado" readonly></textarea>
+
+    </div>
+  </div>
+
+  <!-- =====///////////////// CAMPO / OPERAÇÃO: SCRIPT DESARME /////////////////// =====
+       Reintegrado do backup scriptdebloqueioslinhaviva-v2 (js/desarme.js,
+       módulo #desarme) — ver auditoria. Mesmos campos/rótulos/opções do
+       original, ids já vinham prefixados "ds_" desde o backup. ÚNICA
+       diferença de regra de negócio em relação ao original: o campo
+       Observação (ds_obs) agora aparece no relatório gerado — o
+       original tinha esse campo no formulário mas nunca o incluía no
+       texto final (bug confirmado e corrigido isoladamente; ver
+       js/scripts-campo/desarme.js). -->
+  <div id="desarme" class="module">
+    <div class="container">
+      <h2>Script Desarme</h2>
+
+      <div class="linha-3">
+        <div>
+          <label for="ds_ativo_tipo">Ativo</label>
+          <div class="linha-2">
+            <select id="ds_ativo_tipo">
+              <option value="RD">RD</option>
+              <option value="CF">CF</option>
+              <option value="FR">FR</option>
+              <option value="CS">CS</option>
+              <option value="SEC">SEC</option>
+            </select>
+            <input id="ds_ativo_num" placeholder="180-548376">
+          </div>
+        </div>
+        <div>
+          <label for="ds_datahora">Data / Hora</label>
+          <input type="datetime-local" id="ds_datahora" step="1">
+        </div>
+        <div>
+          <label for="ds_uc">UC Atingidas</label>
+          <input id="ds_uc" placeholder="1.229">
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="ds_subestacao">Subestação</label>
+          <select id="ds_subestacao">
+            <option value="">Selecione</option>
+            <option>SMD</option>
+            <option>ARJ</option>
+            <option>ATL</option>
+            <option>CBT</option>
+            <option>CJB</option>
+            <option>CMD</option>
+            <option>CRP</option>
+            <option>CRT</option>
+            <option>CTN</option>
+            <option>FPL</option>
+            <option>GCD</option>
+            <option>GRU</option>
+            <option>ITB</option>
+            <option>ITP</option>
+            <option>LGR</option>
+            <option>LGT</option>
+            <option>MRI</option>
+            <option>MSQ</option>
+            <option>MTA</option>
+            <option>MTB</option>
+            <option>NSD</option>
+            <option>NSG</option>
+            <option>PPR</option>
+            <option>PRT</option>
+            <option>PVD</option>
+            <option>RCH</option>
+            <option>SCT</option>
+            <option>SEC. CMP</option>
+            <option>SLG</option>
+            <option>SMS</option>
+            <option>SRY</option>
+            <option>TCC</option>
+            <option>URB</option>
+            <option>XNG</option>
+          </select>
+        </div>
+        <div>
+          <label for="ds_alimentador">Alimentador</label>
+          <input id="ds_alimentador" placeholder="01F5">
+        </div>
+        <div>
+          <label for="ds_clima">Condições Climáticas</label>
+          <select id="ds_clima">
+            <option>Normal</option>
+            <option>Chuva</option>
+            <option>Chuva forte</option>
+            <option>Descargas Atmosféricas</option>
+            <option>Nublado</option>
+            <option>Ventos fortes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-2">
+        <div>
+          <label for="ds_situacao">Situação Atual</label>
+          <select id="ds_situacao">
+            <option>Equipe(s) do DEOP acionada(s)</option>
+            <option>Equipe(s) inspecionando o circuito</option>
+            <option>Equipe(s) no local</option>
+            <option>Equipe da CAUT acionada</option>
+            <option>Equipe da CAUT no local</option>
+            <option>Equipe do DCMD acionada</option>
+            <option>Equipe do DCMD no local</option>
+          </select>
+        </div>
+        <div>
+          <label for="ds_obs">Observação</label>
+          <select id="ds_obs">
+            <option>Desarme sem sucesso no 1º ciclo de religamento.</option>
+            <option>Desarme sem sucesso no 2º ciclo de religamento.</option>
+            <option>Desarme com sucesso no 1º ciclo (sem perda de cargas).</option>
+            <option>Desarme com sucesso no 2º ciclo (sem perda de cargas).</option>
+            <option>Abertura emergencial – condutor partido.</option>
+            <option>Abertura emergencial – poste abalroado.</option>
+            <option>Abertura emergencial – acidente com terceiros.</option>
+            <option>Abertura emergencial – jumper provisório.</option>
+            <option>Abertura emergencial – árvore na rede.</option>
+            <option>Abertura emergencial – objeto estranho.</option>
+            <option>Abertura emergencial – animal na rede.</option>
+          </select>
+        </div>
+      </div>
+
+      <button onclick="dsGerarRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Gerar e Copiar</button>
+      <button class="sec" onclick="dsLimparRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Limpar</button>
+
+      <label for="ds_resultado">Resultado:</label>
+      <textarea id="ds_resultado" readonly></textarea>
+
+    </div>
+  </div>
+
+  <!-- =====///////////////// CAMPO / OPERAÇÃO: PREENCHIMENTO DE SS /////////////////// =====
+       Reintegrado do backup scriptdebloqueioslinhaviva-v2 (js/ss.js,
+       módulo #ss) — ver auditoria. Mesmos campos/rótulos/opções do
+       original; ids de campo já vinham prefixados "ss_" desde o backup.
+       Módulo renomeado de "ss" (cryptico fora de contexto) para
+       "preenchimento_ss" (mais descritivo, mesmo critério usado em
+       bloqueios_lv). Nenhuma regra de negócio alterada — nenhum bug foi
+       encontrado neste módulo (diferente do Desarme). -->
+  <div id="preenchimento_ss" class="module">
+    <div class="container">
+      <h2>Preenchimento de SS</h2>
+
+      <div class="linha-3">
+        <div>
+          <label for="ss_regional">Polo / Regional</label>
+          <select id="ss_regional">
+            <option value="">Selecione</option>
+            <option>ARACAJU</option>
+            <option>N.S SOCORRO</option>
+            <option>SÃO CRISTÓVÃO</option>
+            <option>ITABAIANA</option>
+            <option>LAGARTO</option>
+            <option>N.S GLÓRIA</option>
+            <option>N.S DORES</option>
+            <option>PROPRIÁ</option>
+            <option>MARUIM</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss_abrangencia">Abrangência</label>
+          <select id="ss_abrangencia">
+            <option value="">Selecione</option>
+            <option value="T1">T1 - ALIMENTADOR</option>
+            <option value="T2">T2 - RELIGADOR</option>
+            <option value="T3">T3 - CHAVE SECCIONADORA</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss_equipe">Tipo de Equipe</label>
+          <select id="ss_equipe">
+            <option value="">Selecione</option>
+            <option>LINHA MORTA</option>
+            <option>LINHA VIVA</option>
+            <option>EQUIPE PODA</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="ss_acesso">Acesso para Caminhão</label>
+          <select id="ss_acesso">
+            <option value="">Selecione</option>
+            <option>COM ACESSO</option>
+            <option>SEM ACESSO</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss_ref">Chave Referência</label>
+          <select id="ss_ref">
+            <option value="">Selecione</option>
+            <option value="CF">CF - CHAVE FUSÍVEL</option>
+            <option value="CS">CS - CHAVE FACA</option>
+            <option value="TD">TD - TRANSFORMADOR DE DISTRIBUIÇÃO</option>
+            <option value="RD">RD - RELIGADOR DE DISTRIBUIÇÃO</option>
+            <option value="RT">RT - REGULADOR DE TENSÃO</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss_num">N° Chave</label>
+          <input id="ss_num" type="number" inputmode="numeric" pattern="[0-9]*">
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div>
+          <label for="ss_id">ID:</label>
+          <input id="ss_id" type="number" inputmode="numeric" pattern="[0-9]*">
+        </div>
+        <div>
+          <label for="ss_servico">Descrição do Serviço:</label>
+          <input id="ss_servico">
+        </div>
+        <div>
+          <label for="ss_coord">Coordenadas:</label>
+          <input id="ss_coord">
+        </div>
+      </div>
+
+      <label for="ss_endereco">Endereço do Serviço:</label>
+      <input id="ss_endereco">
+
+      <label for="ss_obs">Observações Relevantes:</label>
+      <textarea id="ss_obs"></textarea>
+
+      <div class="linha-3">
+        <button onclick="ssGerarRelatorioWhats()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Gerar Relatório WhatsApp</button>
+        <button onclick="ssGerarRelatorioPadrao()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Gerar Relatório SS</button>
+        <button class="sec" onclick="ssLimparRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Limpar</button>
+      </div>
+
+      <label for="ss_resultado">Resultado:</label>
+      <textarea id="ss_resultado" readonly></textarea>
+
+    </div>
+  </div>
+
+  <!-- =====///////////////// CAMPO / OPERAÇÃO: SUBSTITUIÇÃO DE POSTE /////////////////// =====
+       Reintegrado do backup scriptdebloqueioslinhaviva-v2 (js/substituicao_poste.js,
+       módulo #substituicao_poste) — ver auditoria. Mesmos campos/rótulos/
+       opções/ordem do original; ids já vinham prefixados "sp_" desde o
+       backup. Nenhuma regra de negócio alterada — nenhum bug foi
+       encontrado neste módulo. Duas peculiaridades do original foram
+       observadas e preservadas (não "corrigidas"): os geradores não
+       mostram toast de sucesso, e Limpar não reaplica o esmaecimento
+       visual dos campos condicionais — ver js/scripts-campo/substituicao-poste.js. -->
+  <div id="substituicao_poste" class="module">
+    <div class="container">
+
+      <h2>🛠️ Substituição de Poste</h2>
+
+      <div class="linha-5-rel">
+        <div><label for="sp_operador">Operador:</label><input id="sp_operador" required></div>
+        <div><label for="sp_ocorrencia">Nº Ocorrência:</label><input id="sp_ocorrencia" required></div>
+
+        <div>
+          <label for="sp_tipo_poste">Tipo de Poste:</label>
+          <select id="sp_tipo_poste">
+            <option value="" selected disabled>Selecione</option>
+            <option>POSTE BT</option>
+            <option>POSTE MT</option>
+            <option>POSTE BT/MT</option>
+          </select>
+        </div>
+
+        <div><label for="sp_id_poste">ID do Poste:</label><input id="sp_id_poste" required></div>
+
+        <div>
+          <label for="sp_causa">Causa:</label>
+          <select id="sp_causa">
+            <option value="" selected disabled>Selecione</option>
+            <option>abalroado</option>
+            <option>Fletido</option>
+            <option>Quebrado</option>
+            <option>Fora de prumo</option>
+            <option>Ferragens expostas</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-5-rel">
+        <div>
+          <label for="sp_altura">Tipo / Altura / Esforço:</label>
+          <input id="sp_altura" required>
+        </div>
+
+        <div>
+          <label for="sp_chave_ref">Chave de Referência:</label>
+          <select id="sp_chave_ref">
+            <option value="" selected disabled>Selecione</option>
+            <option>CF</option>
+            <option>CS</option>
+            <option>TD</option>
+            <option>RD</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="sp_num_chave">Nº da Chave:</label>
+          <input id="sp_num_chave">
+        </div>
+
+        <div>
+          <label for="sp_acesso">Acesso para Caminhão?</label>
+          <select id="sp_acesso">
+            <option value="" selected disabled>Selecione</option>
+            <option>BOM</option>
+            <option>RUIM</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="sp_cordoalha">Cordoalha Telemar?</label>
+          <select id="sp_cordoalha">
+            <option value="" selected disabled>Selecione</option>
+            <option>SIM</option>
+            <option>NÃO</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-4-rel">
+        <div>
+          <label for="sp_regional">Polo / Regional:</label>
+          <select id="sp_regional">
+            <option value="" selected disabled>Selecione</option>
+            <option>ARACAJU</option>
+            <option>N.S SOCORRO</option>
+            <option>BARRA DOS COQUEIROS</option>
+            <option>ITABAIANA</option>
+            <option>LAGARTO</option>
+            <option>SÃO CRISTÓVÃO</option>
+            <option>N.S GLÓRIA</option>
+            <option>N.S DORES</option>
+            <option>PROPRIÁ</option>
+            <option>MARUIM</option>
+          </select>
+        </div>
+
+        <div><label for="sp_bairro">Cidade / Bairro / Povoado:</label><input id="sp_bairro"></div>
+        <div><label for="sp_referencia">Ponto de Referência:</label><input id="sp_referencia"></div>
+        <div><label for="sp_coord">Coordenadas:</label><input id="sp_coord"></div>
+      </div>
+
+      <div class="linha-3">
+        <div><label for="sp_est_mt">Tipo Estrutura MT</label><input id="sp_est_mt"></div>
+        <div>
+          <label for="sp_rede_mt">Tipo Rede MT</label>
+          <select id="sp_rede_mt">
+            <option value="" selected disabled>Selecione</option>
+            <option>Convencional</option>
+            <option>Compacta</option>
+          </select>
+        </div>
+        <div>
+          <label for="sp_bitola_mt">Bitola MT:</label>
+          <input id="sp_bitola_mt" placeholder="Ex: 4 AWG / 2/0 / 336">
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <div><label for="sp_est_bt">Tipo Estrutura BT</label><input id="sp_est_bt"></div>
+        <div>
+          <label for="sp_rede_bt">Tipo Rede BT</label>
+          <select id="sp_rede_bt">
+            <option value="" selected disabled>Selecione</option>
+            <option>Convencional</option>
+            <option>Multiplex</option>
+          </select>
+        </div>
+        <div>
+          <label for="sp_bitola_bt">Bitola BT</label>
+          <select id="sp_bitola_bt">
+            <option value="" selected disabled>Selecione</option>
+            <option>4 AWG</option>
+            <option>2 AWG</option>
+            <option>1/0</option>
+            <option>25 mm²</option>
+            <option>35 mm²</option>
+            <option>50 mm²</option>
+            <option>70 mm²</option>
+            <option>120 mm²</option>
+            <option>Outros</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-4-rel">
+        <div><label for="sp_veiculo">Causado por veículo?</label><select id="sp_veiculo"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_policia">Acionada Polícia / SAMU?</label><select id="sp_policia"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_vitima">Vítima?</label><select id="sp_vitima"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_foto_placa">Foto da placa?</label><select id="sp_foto_placa"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+      </div>
+
+      <div class="linha-4-rel">
+        <div><label for="sp_doc">Foto doc. condutor?</label><select id="sp_doc"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_end">Endereço / telefone?</label><select id="sp_end"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_danos">Foto veículo / danos?</label><select id="sp_danos"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_camera">Câmeras no local?</label><select id="sp_camera"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+      </div>
+
+      <div class="linha-4-rel">
+        <div><label for="sp_medidor">Nº Medidor UC c/ câmera</label><input id="sp_medidor"></div>
+        <div><label for="sp_veiculo_desc">Veículo / Cor / Placa</label><input id="sp_veiculo_desc"></div>
+        <div><label for="sp_empresa">Veículo empresa / órgão?</label><select id="sp_empresa"><option value="" selected disabled>Selecione</option>
+        <option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="sp_qual">Qual?</label><input id="sp_qual"></div>
+      </div>
+
+      <div class="linha-3">
+        <textarea id="sp_obs_condutor" placeholder="Observações sobre o condutor"></textarea>
+        <textarea id="sp_materiais" placeholder="Materiais necessários"></textarea>
+        <textarea id="sp_obs_gerais" placeholder="Observações relevantes"></textarea>
+      </div>
+
+      <div class="linha-3">
+        <button onclick="spGerarRelatorioWhats()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Gerar texto WhatsApp</button>
+        <button onclick="spGerarRelatorioSS()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Gerar texto SS</button>
+        <button class="sec" onclick="spLimparRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Limpar</button>
+      </div>
+
+      <label for="sp_resultado">Script Gerado</label>
+      <textarea id="sp_resultado" readonly></textarea>
+
+    </div>
+  </div>
+
+  <!-- =====///////////////// CAMPO / OPERAÇÃO: SUBSTITUIÇÃO DE TRANSFORMADOR /////////////////// =====
+       Reintegrado do backup scriptdebloqueioslinhaviva-v2 (js/trafo.js,
+       módulo #trafo) — ver auditoria. Mesmos campos/rótulos/opções/
+       ordem do original; ids já vinham prefixados "tf_" desde o
+       backup. Módulo renomeado de "trafo" (apelido informal) para
+       "substituicao_transformador" (mesmo critério de bloqueios_lv/
+       preenchimento_ss). Nenhuma regra de negócio alterada — a regra
+       condicional de obrigatórios por Motivo (Sobrecarga/Falta de
+       fase -> Carregamento; Vazamento de óleo -> GLV+GLV Extraído;
+       Furto -> Clientes Desenergizados) foi preservada exatamente —
+       ver js/scripts-campo/substituicao-transformador.js. -->
+  <div id="substituicao_transformador" class="module">
+    <div class="container">
+
+      <h2>🔁 Substituição de Transformador</h2>
+
+      <div class="linha-6">
+        <div>
+          <label for="tf_operador">Operador:</label>
+          <input id="tf_operador" required>
+        </div>
+        <div><label for="tf_ocorrencia">Ocorrência:</label><input id="tf_ocorrencia" required></div>
+        <div><label for="tf_trafo">N° Trafo:</label><input id="tf_trafo" required></div>
+        <div><label for="tf_id">ID:</label><input id="tf_id" required></div>
+        <div><label for="tf_motivo">Motivo:</label>
+          <select id="tf_motivo">
+            <option value="">Selecione</option>
+            <option>Falta de fase</option>
+            <option>Sobrecarga</option>
+            <option>Furto</option>
+            <option>Trafo queimado</option>
+            <option>Vazamento de óleo</option>
+          </select>
+        </div>
+        <div><label for="tf_causa">Causa:</label>
+          <select id="tf_causa">
+            <option value="">Selecione</option>
+            <option>Causa não identificada</option>
+            <option>Faltando fase internamente</option>
+            <option>Sobretensão</option>
+            <option>Defeito em transformador particular</option>
+            <option>Subtensão</option>
+            <option>Queimado por pássaro/animal</option>
+            <option>Falha bucha de BT</option>
+            <option>Tanque deteriorado</option>
+            <option>Queimado por descarga atmosférica</option>
+            <option>Faltando neutro</option>
+            <option>Queimado por sobrecarga</option>
+            <option>Queimado por curto na rede</option>
+            <option>Cabo aterramento partido</option>
+            <option>Falha bucha de AT</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-6">
+        <div><label for="tf_regional">Regional:</label><select id="tf_regional">
+          <option value="">Selecione</option>
+          <option>ARACAJU</option>
+          <option>SÃO CRISTÓVÃO</option>
+          <option>N.S.SOCORRO</option>
+          <option>ITABAIANA</option>
+          <option>LAGARTO</option>
+          <option>N.S.GLÓRIA </option>
+          <option>N.S.DORES</option>
+          <option>PROPRIÁ</option>
+          <option>MARUIM</option>
+        </select></div>
+
+        <div><label for="tf_cidade">Cidade/Povoado:</label><input id="tf_cidade"></div>
+        <div><label for="tf_endereco">Endereço:</label><input id="tf_endereco"></div>
+        <div><label for="tf_referencia">Ponto Ref:</label><input id="tf_referencia"></div>
+        <div><label for="tf_coord">Coordenadas:</label><input id="tf_coord"></div>
+
+        <div><label for="tf_acesso">Acs.Caminhão?</label>
+          <select id="tf_acesso">
+            <option value="">Selecione</option>
+            <option>BOM</option>
+            <option>RUIM</option>
+            <option>APENAS 4X4</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="linha-6">
+        <div><label for="tf_classe">Classe:</label><select id="tf_classe">
+          <option value="">Selecione</option>
+          <option>Monofásico</option>
+          <option>Bifásico</option>
+          <option>Trifásico</option>
+        </select></div>
+
+        <div><label for="tf_potencia">Potência:</label><input id="tf_potencia"></div>
+
+        <div><label for="tf_proprietario">Proprietário:</label>
+          <select id="tf_proprietario">
+            <option value="">Selecione</option>
+            <option>Companhia</option>
+            <option>Particular</option>
+            <option>Incorporação</option>
+          </select>
+        </div>
+
+        <div><label for="tf_tensao_sec">Tensão Sec.:</label>
+          <select id="tf_tensao_sec">
+            <option value="">Selecione</option>
+            <option>127/220v</option>
+            <option>220/380v</option>
+          </select>
+        </div>
+
+        <div><label for="tf_carregamento">Carregamento:</label><input id="tf_carregamento"></div>
+        <div><label for="tf_total_clientes">Total Clientes</label><input id="tf_total_clientes"></div>
+      </div>
+
+      <div class="linha-4-rel">
+        <div><label for="tf_corrosao">Local de Corrosão Atm?</label><select id="tf_corrosao"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="tf_clientes_des">Clientes Desenergisado?</label><select id="tf_clientes_des"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="tf_total_des">Total Desenergisado:</label><input id="tf_total_des"></div>
+        <div><label for="tf_transferido">Circuito foi transferido?</label><select id="tf_transferido"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+      </div>
+
+      <div class="linha-6">
+        <div><label for="tf_bitola_mt">Bitola MT:</label> <select id="tf_bitola_mt">
+            <option value="" selected disabled>Selecione</option>
+            <option>4 AWG S/ALMA</option>
+            <option>4 AWG C/ALMA</option>
+            <option>2 AWG</option>
+            <option>1/0</option>
+            <option>2/0</option>
+            <option>4/0</option>
+            <option>336</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div><label for="tf_glv">Possui GLV?</label><select id="tf_glv"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="tf_glv_extraido">GLV foi extraido?</label><select id="tf_glv_extraido"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="tf_aterramento">Aterramento?</label><select id="tf_aterramento"><option value="">Selecione</option><option>SIM</option><option>NÃO</option><option>DANIFICADO</option></select></div>
+        <div><label for="tf_pr_bt">PRBT?</label><select id="tf_pr_bt"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+        <div><label for="tf_pr_mt">PRMT?</label><select id="tf_pr_mt"><option value="">Selecione</option><option>SIM</option><option>NÃO</option></select></div>
+      </div>
+
+      <div class="linha-2">
+        <div>
+          <label for="tf_materiais">Materiais Necessários:</label>
+          <textarea id="tf_materiais"></textarea>
+        </div>
+        <div>
+          <label for="tf_obs">Observações:</label>
+          <textarea id="tf_obs"></textarea>
+        </div>
+      </div>
+
+      <div class="linha-3">
+        <button onclick="tfGerarRelatorioWhats()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Gerar WhatsApp</button>
+        <button onclick="tfGerarRelatorioSS()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Gerar SS</button>
+        <button class="sec" onclick="tfLimparRelatorio()"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo</button>
+      </div>
+
+      <label for="tf_resultado">Resultado</label>
+      <textarea id="tf_resultado" readonly></textarea>
+
+    </div>
+  </div>
+
+  <!-- =====///////////////// MAPAS REGIONAIS/////////////////// =====
+       Módulo já sem nenhum botão de menu apontando pra ele desde antes
+       desta demo (ver comentário na categoria "Operação" acima). VERSÃO
+       DEMONSTRATIVA: as 5 imagens originais (mapas/mapa1.jpg a mapa5.jpg)
+       continham códigos de despacho operacional reais por município —
+       deletadas desta cópia; conteúdo substituído pelo placeholder abaixo
+       em vez de deixar <img> quebradas apontando para arquivos removidos. -->
+<div id="mapas_regionais" class="module">
+  <div class="container">
+    <h2>Material operacional interno removido da versão demonstrativa.</h2>
+    <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
+      Este módulo exibia mapas com códigos de despacho operacional internos reais e foi
+      removido desta cópia pública por segurança.
+    </p>
+  </div>
+</div>
+
+
+<!-- =====///////////////// MAPAS DAS REGIONAIS (novo, independente) /////////////////// =====
+     Etapa 1 — esqueleto: seletor de Polo/Regional (sem carregar GeoJSON
+     ainda), área reservada do mapa (segunda instância Leaflet própria,
+     ver js/mapas-regionais.js) e painel lateral reservado para a futura
+     legenda/informações territoriais. Nenhuma classe/id daqui é
+     compartilhada com o Mapa Operacional da Gestão de Equipes. -->
+<div id="mapas_territoriais" class="module">
+  <div class="container">
+
+    <h2>🗺️ Mapas das Regionais</h2>
+
+    <div class="regtm-topo">
+      <div class="regtm-campo-seletor">
+        <label for="regtm_select_polo">Regional / Polo</label>
+        <select id="regtm_select_polo" class="regtm-select">
+          <option value="">Selecione uma regional</option>
+        </select>
+      </div>
+      <div class="regtm-selecao-indicador" id="regtm_selecao_indicador" data-regtm-vazio="true">
+        Nenhuma regional selecionada ainda.
+      </div>
+    </div>
+
+    <div class="regtm-layout">
+      <div class="regtm-mapa-wrap">
+        <div id="mapas_territoriais_mapa" class="regtm-mapa"></div>
+      </div>
+
+      <div class="regtm-painel-lateral" id="regtm_painel_lateral">
+        <h3>Legenda / Informações</h3>
+        <div class="regtm-painel-vazio">Reservado para a próxima etapa (legenda territorial e detalhes da localidade selecionada).</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- =====///////////////// PENDÊNCIAS (Fase 3, etapa 4) /////////////////// =====
+     COMPARTILHADA por polo (ao contrário dos Scripts, privados por
+     operador) — fonte de verdade é sempre a API (backend/app/routers/
+     pendencias.py); nada aqui usa localStorage para os dados. Ver
+     js/pendencias.js / css/pendencias.css. -->
+<div id="pendencias" class="module">
+  <div class="pendencias-wrap">
+    <div class="pendencias-header">
+      <h2>Pendências</h2>
+      <button type="button" id="pend_btn_nova" class="pendencias-btn-nova">+ Nova Pendência</button>
+    </div>
+
+    <div class="pendencias-subnav">
+      <button type="button" class="pendencias-subnav-btn ativo" data-tipo="TODAS">Todas</button>
+      <button type="button" class="pendencias-subnav-btn" data-tipo="COMERCIAL">Comerciais</button>
+      <button type="button" class="pendencias-subnav-btn" data-tipo="TECNICA">Técnicas</button>
+    </div>
+
+    <div class="pendencias-filtros">
+      <select id="pend_filtro_polo"><option value="">Polo (todos)</option></select>
+      <select id="pend_filtro_status">
+        <option value="">Status (todos)</option>
+        <option value="PENDENTE">Pendente</option>
+        <option value="EXECUTADA">Executada</option>
+        <option value="CANCELADA">Cancelada</option>
+      </select>
+      <select id="pend_filtro_categoria"><option value="">Categoria (todas)</option></select>
+      <select id="pend_filtro_submotivo"><option value="">Submotivo (todos)</option></select>
+      <input id="pend_filtro_responsabilidade" placeholder="Responsabilidade exata...">
+      <input id="pend_filtro_busca" placeholder="Buscar código/OS/INC/SS/descrição...">
+    </div>
+
+    <div class="pendencias-resumo">
+      <div class="pendencias-resumo-item"><span id="pend_resumo_total">0</span><label>Total</label></div>
+      <div class="pendencias-resumo-item"><span id="pend_resumo_pendentes">0</span><label>Pendentes</label></div>
+      <div class="pendencias-resumo-item pendencias-resumo-vencida"><span id="pend_resumo_vencidas">0</span><label>Vencidas</label></div>
+      <div class="pendencias-resumo-item pendencias-resumo-hoje"><span id="pend_resumo_hoje">0</span><label>Vencem hoje</label></div>
+    </div>
+
+    <div id="pend_erro_lista" class="pendencias-erro" style="display:none;"></div>
+    <div id="pend_lista" class="pendencias-lista"></div>
+    <div id="pend_vazio" class="pendencias-vazio" style="display:none;">Nenhuma pendência encontrada.</div>
+  </div>
+</div>
+
+<!-- MODAL: NOVA PENDÊNCIA -->
+<div id="pend_modal_novo" class="modal">
+  <div class="modal-content pendencias-modal-form">
+    <span class="fechar" onclick="pendenciasFecharModalNovo()">&times;</span>
+    <h2>Nova Pendência</h2>
+
+    <div class="pendencias-tipo-toggle">
+      <button type="button" class="pendencias-tipo-btn ativo" data-tipo="TECNICA">Técnica</button>
+      <button type="button" class="pendencias-tipo-btn" data-tipo="COMERCIAL">Comercial</button>
+    </div>
+
+    <div class="linha-2">
+      <div>
+        <label for="pend_form_polo">Polo</label>
+        <select id="pend_form_polo"><option value="">Selecione</option></select>
+      </div>
+      <div>
+        <label for="pend_form_vencimento">Data de vencimento</label>
+        <input type="date" id="pend_form_vencimento">
+      </div>
+    </div>
+
+    <!-- Causa/Subcausa: texto livre (Fase 3/Etapa 5) — categoria/submotivo
+         pré-cadastrados (pendencia_categorias/pendencia_submotivos) ainda
+         não têm carga de dados nem tela de cadastro; a API continua
+         aceitando o modo estruturado (categoria_id/submotivo_id) quando
+         esse catálogo existir no futuro, ver js/pendencias.js. -->
+    <div class="linha-2">
+      <div>
+        <label for="pend_form_causa">Causa / Motivo</label>
+        <input id="pend_form_causa" maxlength="150">
+      </div>
+      <div>
+        <label for="pend_form_subcausa">Subcausa / Submotivo</label>
+        <input id="pend_form_subcausa" maxlength="150">
+      </div>
+    </div>
+
+    <div class="linha-2 pendencias-oculto" id="pend_form_linha_comercial">
+      <div>
+        <label for="pend_form_os">Nº da OS</label>
+        <input id="pend_form_os">
+      </div>
+      <div>
+        <label for="pend_form_ss_comercial">Nº da SS (se houver)</label>
+        <input id="pend_form_ss_comercial">
+      </div>
+    </div>
+
+    <div class="linha-2" id="pend_form_linha_tecnica">
+      <div>
+        <label for="pend_form_inc">Nº do INC (opcional)</label>
+        <input id="pend_form_inc" placeholder="Em branco: backend gera o código PD">
+      </div>
+      <div>
+        <label for="pend_form_ss_tecnica">Nº da SS (se houver)</label>
+        <input id="pend_form_ss_tecnica">
+      </div>
+    </div>
+
+    <label for="pend_form_descricao">Descrição</label>
+    <textarea id="pend_form_descricao"></textarea>
+
+    <div class="linha-2">
+      <div>
+        <label for="pend_form_responsabilidade">Responsabilidade</label>
+        <input id="pend_form_responsabilidade">
+        <span class="pendencias-hint" id="pend_form_responsabilidade_hint"></span>
+      </div>
+      <div class="pendencias-checkbox-linha">
+        <label class="pendencias-checkbox-label">
+          <input type="checkbox" id="pend_form_passagem_turno">
+          Entra na Passagem de Turno
+        </label>
+        <span class="pendencias-hint" id="pend_form_passagem_hint"></span>
+      </div>
+    </div>
+
+    <label for="pend_form_observacao">Observação</label>
+    <textarea id="pend_form_observacao"></textarea>
+
+    <div id="pend_form_erro" class="pendencias-erro" style="display:none;"></div>
+
+    <div class="linha-2">
+      <button type="button" class="sec" onclick="pendenciasFecharModalNovo()">Cancelar</button>
+      <button type="button" id="pend_btn_salvar_novo">Salvar Pendência</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DETALHE -->
+<div id="pend_modal_detalhe" class="modal">
+  <div class="modal-content">
+    <span class="fechar" onclick="pendenciasFecharModalDetalhe()">&times;</span>
+    <h2 id="pend_detalhe_codigo">PD-...</h2>
+    <div id="pend_detalhe_corpo" class="pendencias-detalhe-corpo"></div>
+    <div class="linha-3">
+      <button type="button" class="sec" onclick="pendenciasFecharModalDetalhe()">Fechar</button>
+      <button type="button" id="pend_btn_editar_detalhe" class="sec">Editar</button>
+      <button type="button" id="pend_btn_executar" onclick="pendenciasConfirmarExecutar()">Executar</button>
+    </div>
+    <div class="linha-2">
+      <button type="button" id="pend_btn_cancelar" class="pendencias-btn-perigo" onclick="pendenciasConfirmarCancelar()">Cancelar Pendência</button>
+    </div>
+    <div id="pend_detalhe_editar" class="pendencias-detalhe-editar"></div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR AÇÃO (executar/cancelar) -->
+<div id="pend_modal_confirmar" class="modal">
+  <div class="modal-content pendencias-modal-confirmar">
+    <p id="pend_confirmar_texto"></p>
+    <div id="pend_confirmar_erro" class="pendencias-erro" style="display:none;"></div>
+    <div class="linha-2">
+      <button type="button" class="sec" onclick="pendenciasFecharModalConfirmar()">Voltar</button>
+      <button type="button" id="pend_btn_confirmar_acao">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- =====///////////////// PASSAGEM DE TURNO (Fase 4, etapa 4A — painel operacional) /////////////////// =====
+     COMPARTILHADA por polo, sobre a API de backend/app/routers/
+     passagem_turno.py (etapa 3) — substitui o Microsoft Forms usado até
+     aqui. PAINEL DE PÁGINA ÚNICA (não wizard): configuração, pendências e
+     as 9 perguntas operacionais ficam todas na mesma página, com rolagem
+     normal — ver js/passagem-turno.js / css/passagem-turno.css. Nenhum
+     dado de Pendências é duplicado aqui: os cards de pendência reaproveitam
+     os campos que a própria API já devolve (PendenciaOut). -->
+<div id="passagem_turno" class="module">
+  <div class="pt-wrap">
+    <div class="pt-header">
+      <div class="pt-header-titulo">
+        <h2>Passagem de Turno</h2>
+        <p class="pt-header-subtitulo">Planejamento e continuidade operacional</p>
+      </div>
+      <div class="pt-remetente" id="pt_remetente_info"></div>
+    </div>
+
+    <div id="pt_erro_geral" class="pendencias-erro" style="display:none;"></div>
+
+    <!-- CONFIGURAÇÃO DA PASSAGEM (turno + polos + destinatário, tudo compacto) -->
+    <section class="pt-secao" id="pt_secao_config">
+      <h3>Configuração da Passagem</h3>
+
+      <div id="pt_config_edicao">
+        <div class="pt-config-bloco">
+          <label class="pt-config-rotulo">Turno</label>
+          <div class="pt-turno-presets">
+            <button type="button" class="pt-turno-btn" data-turno="06h-14h">06h–14h</button>
+            <button type="button" class="pt-turno-btn" data-turno="14h-22h">14h–22h</button>
+            <button type="button" class="pt-turno-btn" data-turno="22h-06h">22h–06h</button>
+            <button type="button" class="pt-turno-btn" id="pt_turno_btn_outro">Outro</button>
+          </div>
+          <div id="pt_turno_manual">
+            <input id="pt_turno_input" placeholder="Ex: 06h-14h">
+          </div>
+        </div>
+
+        <div class="pt-config-bloco">
+          <label class="pt-config-rotulo">Polo(s) e destinatário de cada polo</label>
+          <div class="pt-bulk-acao" id="pt_bulk_wrap" style="display:none;">
+            <select id="pt_bulk_destinatario"></select>
+            <button type="button" class="sec" id="pt_btn_bulk_aplicar">Aplicar a todos os polos selecionados</button>
+          </div>
+          <div class="pt-config-polos-lista" id="pt_polos_grid"></div>
+        </div>
+
+        <div id="pt_config_erro" class="pendencias-erro" style="display:none;"></div>
+        <div class="pt-config-acoes">
+          <span></span>
+          <button type="button" id="pt_btn_confirmar_config">Confirmar configuração</button>
+        </div>
+      </div>
+
+      <div id="pt_config_resumo" class="pt-config-resumo" hidden>
+        <div id="pt_config_resumo_lista"></div>
+        <button type="button" class="sec" id="pt_btn_nova_passagem_topo">+ Iniciar nova passagem</button>
+      </div>
+    </section>
+
+    <!-- CORPO: só aparece depois de confirmar a configuração acima -->
+    <div id="pt_corpo" hidden>
+      <div class="pt-polo-tabs" id="pt_polo_tabs"></div>
+
+      <!-- PENDÊNCIAS DO POLO -->
+      <section class="pt-secao">
+        <h3>Pendências do Polo <span class="pt-secao-polo-tag" id="pt_pendencias_polo_tag"></span></h3>
+        <p class="pt-secao-legenda">Recuperadas automaticamente do módulo de Pendências. Remover aqui não exclui a pendência original.</p>
+        <div id="pt_pendencias_erro" class="pendencias-erro" style="display:none;"></div>
+        <div class="pt-pendencias-lista" id="pt_pendencias_lista"></div>
+      </section>
+
+      <!-- INFORMAÇÕES OPERACIONAIS -->
+      <section class="pt-secao">
+        <div class="pt-secao-titulo-linha">
+          <div>
+            <h3>Informações Operacionais <span class="pt-secao-polo-tag" id="pt_itens_polo_tag"></span></h3>
+            <p class="pt-secao-legenda">Responda apenas o que existir agora neste polo. Cada pergunta aceita quantos itens forem necessários.</p>
+          </div>
+          <button type="button" class="sec" id="pt_btn_ver_passagem_anterior">Ver passagem anterior deste polo</button>
+        </div>
+        <div id="pt_itens_anterior_lista" class="pt-itens-anterior-lista" hidden></div>
+        <div id="pt_itens_erro" class="pendencias-erro" style="display:none;"></div>
+
+        <div class="pt-perguntas-grid" id="pt_perguntas_grid"></div>
+      </section>
+
+      <!-- REVISÃO + TERMO + ENVIO -->
+      <section class="pt-secao">
+        <h3>Revisão Final</h3>
+        <div class="pt-revisao-resumo-topo" id="pt_revisao_resumo_topo"></div>
+        <div class="pt-revisao-lista" id="pt_revisao_tbody"></div>
+
+        <label class="pt-termo-label">
+          <input type="checkbox" id="pt_termo_checkbox">
+          Declaro que revisei as informações e estou ciente de que sou responsável pelas informações que estou repassando ao próximo turno.
+        </label>
+
+        <div id="pt_envio_erro" class="pendencias-erro" style="display:none;"></div>
+
+        <div class="pt-config-acoes">
+          <span></span>
+          <button type="button" class="pt-btn-enviar" id="pt_btn_enviar" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar e enviar passagem</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- CONFIRMAÇÃO -->
+    <div class="pt-confirmacao-box" id="pt_confirmacao" hidden>
+      <h3>Passagem de turno enviada com sucesso.</h3>
+      <div id="pt_confirmacao_corpo"></div>
+      <button type="button" id="pt_btn_nova_passagem">Iniciar nova passagem</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: item de uma pergunta operacional — genérico, reaproveitado pelas
+     9 perguntas (Etapa 4A: nada de seletor de "tipo de item" na tela
+     principal; o tipo já vem fixado pelo card/botão que abriu o modal). -->
+<div id="pt_modal_item" class="modal">
+  <div class="modal-content pt-modal-item">
+    <span class="fechar" onclick="ptFecharModalItem()">&times;</span>
+    <h2 id="pt_modal_item_titulo">Adicionar item</h2>
+    <p class="pt-modal-item-exemplo" id="pt_modal_item_exemplo"></p>
+
+    <label id="pt_modal_item_label_identificador" for="pt_modal_item_identificador">Identificador</label>
+    <input id="pt_modal_item_identificador">
+
+    <label id="pt_modal_item_label_descricao" for="pt_modal_item_descricao">Descrição</label>
+    <textarea id="pt_modal_item_descricao"></textarea>
+
+    <div id="pt_modal_item_erro" class="pendencias-erro" style="display:none;"></div>
+
+    <div class="linha-2">
+      <button type="button" class="sec" onclick="ptFecharModalItem()">Cancelar</button>
+      <button type="button" id="pt_btn_modal_item_salvar">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTÓRICO E RELATÓRIO DE PASSAGEM DE TURNO (Fase 6) — só
+     ADMINISTRADOR/SUPERVISOR (o botão de menu correspondente fica oculto
+     pra qualquer outro perfil, ver pthAtualizarMenu() em
+     js/passagem-turno-historico.js; o backend também bloqueia com 403).
+     Somente leitura: reaproveita PassagemTurno + PassagemTurnoPendencia +
+     PassagemTurnoItens + Auditoria já existentes, nenhuma tabela nova. -->
+<div id="passagem_turno_historico" class="module">
+  <div class="pt-wrap">
+    <div class="pt-header">
+      <div class="pt-header-titulo">
+        <h2>Histórico de Passagens de Turno</h2>
+        <p class="pt-header-subtitulo">Consulta e relatório — somente leitura</p>
+      </div>
+    </div>
+
+    <div id="pth_erro_geral" class="pendencias-erro" style="display:none;"></div>
+
+    <section class="pt-secao pth-indicadores" id="pth_indicadores"></section>
+
+    <section class="pt-secao">
+      <h3>Filtros</h3>
+      <div class="pth-filtros-grid">
+        <div class="pth-campo">
+          <label for="pth_filtro_polo">Polo</label>
+          <input id="pth_filtro_polo" placeholder="Todos">
+        </div>
+        <div class="pth-campo">
+          <label for="pth_filtro_turno">Turno</label>
+          <input id="pth_filtro_turno" placeholder="Todos">
+        </div>
+        <div class="pth-campo">
+          <label for="pth_filtro_status">Status</label>
+          <select id="pth_filtro_status">
+            <option value="ENVIADA" selected>Enviada</option>
+            <option value="RASCUNHO">Rascunho</option>
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="pth-campo">
+          <label for="pth_filtro_remetente">Remetente</label>
+          <select id="pth_filtro_remetente"><option value="">Todos</option></select>
+        </div>
+        <div class="pth-campo">
+          <label for="pth_filtro_destinatario">Destinatário</label>
+          <select id="pth_filtro_destinatario"><option value="">Todos</option></select>
+        </div>
+        <div class="pth-campo">
+          <label for="pth_filtro_periodo_de">Período — de</label>
+          <input type="date" id="pth_filtro_periodo_de">
+        </div>
+        <div class="pth-campo">
+          <label for="pth_filtro_periodo_ate">Período — até</label>
+          <input type="date" id="pth_filtro_periodo_ate">
+        </div>
+      </div>
+      <div class="pth-filtros-acoes">
+        <button type="button" class="sec" id="pth_btn_limpar_filtros">Limpar filtros</button>
+        <button type="button" id="pth_btn_buscar">Buscar</button>
+      </div>
+    </section>
+
+    <section class="pt-secao">
+      <div id="pth_lista_vazia" class="pth-vazio" hidden>Nenhuma passagem encontrada para os filtros selecionados.</div>
+      <div class="pth-lista" id="pth_lista"></div>
+      <div class="pth-paginacao" id="pth_paginacao"></div>
+    </section>
+  </div>
+</div>
+
+<!-- MODAL: detalhe de uma passagem no histórico -->
+<div id="pth_modal_detalhe" class="modal">
+  <div class="modal-content admin-modal-content admin-modal-largo">
+    <span class="fechar" onclick="pthFecharDetalhe()">&times;</span>
+    <h2 id="pth_detalhe_titulo">Detalhe da passagem</h2>
+    <div id="pth_detalhe_conteudo"></div>
+  </div>
+</div>
+
+<!-- ///////////////CALLBACK WHATSAPP///////////////////////// -->
+<div id="callback" class="module">
+<div class="container">
+<h2>CALLBACK WHATSAPP</h2>
+
+<div id="cbw_painel_whatsapp">
+  <div class="cbw-layout">
+
+    <div class="cbw-painel">
+
+      <div class="cbw-secao-titulo">Operador</div>
+      <div>
+        <label for="cbw_operador">Nome do Operador:</label>
+        <input id="cbw_operador" placeholder="Ex: Thiago">
+      </div>
+
+      <div class="cbw-secao-titulo">Atendimento</div>
+      <div class="cbw-grid-2">
+        <div>
+          <label for="cbw_ocorrencia">Número da Ocorrência:</label>
+          <input id="cbw_ocorrencia" placeholder="Ex: 456987">
+        </div>
+        <div>
+          <label for="cbw_telefone">WhatsApp do Cliente:</label>
+          <input id="cbw_telefone" placeholder="Ex: 79999999999" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="cbw-secao-titulo">Modo da Mensagem</div>
+      <div class="cbw-modo">
+        <input type="radio" name="cbw_modo" id="cbw_modo_padronizada" value="padronizada" checked>
+        <label for="cbw_modo_padronizada">Mensagem Padronizada</label>
+
+        <input type="radio" name="cbw_modo" id="cbw_modo_personalizada" value="personalizada">
+        <label for="cbw_modo_personalizada">Mensagem Personalizada</label>
+      </div>
+
+      <div id="cbw_bloco_padronizada">
+        <label for="cbw_tipo_ocorrencia">Tipo de Ocorrência:</label>
+        <select id="cbw_tipo_ocorrencia">
+          <option value="">Selecione</option>
+          <option value="falta_energia_residencia">Falta de energia — Residência</option>
+          <option value="falta_energia_geral">Falta de energia — Geral</option>
+          <option value="condutor_partido">Condutor partido</option>
+          <option value="oscilacao_energia">Oscilação de energia</option>
+          <option value="choque_instalacao">Choque na instalação</option>
+          <option value="tensao_alta">Tensão alta</option>
+          <option value="faiscas_rede">Centelhamento na rede</option>
+          <option value="faiscas_ramal_servico">Centelhamento no ramal de serviço</option>
+          <option value="defeito_disjuntor">Defeito no disjuntor</option>
+          <option value="inversao_fase">Inversão de fase</option>
+          <option value="defeito_transformador">Defeito no transformador</option>
+          <option value="poste_abalroado">Poste abalroado</option>
+          <option value="poste_auxiliar_quebrado">Poste auxiliar quebrado</option>
+          <option value="problema_ramal_servico">Problema no ramal de serviço</option>
+          <option value="arvore_rede">Árvore na rede</option>
+          <option value="objeto_estranho_rede">Objeto estranho na rede</option>
+          <option value="poste_inclinado">Poste inclinado</option>
+          <option value="incendio">Incêndio</option>
+          <option value="tensao_baixa">Tensão baixa</option>
+          <option value="transformador_oleo">Transformador vazando óleo</option>
+          <option value="condutor_desnivelado">Condutor desnivelado</option>
+        </select>
+      </div>
+
+      <div id="cbw_bloco_personalizada" hidden>
+        <label>Início automático (atualiza com o nome do operador):</label>
+        <div class="cbw-saudacao-auto" id="cbw_saudacao_auto"></div>
+        <label for="cbw_texto_personalizado">Continue a mensagem:</label>
+        <textarea id="cbw_texto_personalizado" rows="5" placeholder="Escreva o restante da mensagem aqui..."></textarea>
+      </div>
+
+      <button type="button" id="cbw_btn_enviar" class="cbw-btn-enviar"><svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Enviar</button>
+
+      <div class="cbw-historico">
+        <div class="cbw-historico-topo">
+          <div class="cbw-secao-titulo" style="margin:0;">Histórico</div>
+          <button type="button" id="cbw_historico_limpar">Limpar histórico</button>
+        </div>
+        <div id="cbw_historico_vazio">Nenhum atendimento registrado ainda.</div>
+        <div id="cbw_historico_lista"></div>
+      </div>
+
+    </div><!-- /cbw-painel -->
+
+    <div class="cbw-phone-wrap">
+      <div class="cbw-phone">
+        <div class="cbw-phone-tela">
+          <div class="cbw-phone-header">
+            <div class="cbw-phone-avatar">C</div>
+            <div class="cbw-phone-header-info">
+              <span class="cbw-phone-header-nome">Cliente</span>
+              <span class="cbw-phone-header-status">online</span>
+            </div>
+          </div>
+          <div class="cbw-phone-chat">
+            <div class="cbw-bolha" id="cbw_preview_bolha">
+              <p class="cbw-preview-texto" id="cbw_preview_texto"></p>
+              <span class="cbw-bolha-hora" id="cbw_preview_hora"></span>
+            </div>
+          </div>
+          <div class="cbw-phone-inputbar">
+            <div class="cbw-fake-input"></div>
+            <div class="cbw-fake-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /cbw-phone-wrap -->
+
+  </div><!-- /cbw-layout -->
+</div><!-- /cbw_painel_whatsapp -->
+
+</div>
+</div>
+
+<!-- =====///////////////// GESTÃO DE EQUIPES + MAPA OPERACIONAL /////////////////// ===== -->
+<div id="equipes" class="module">
+  <div class="container">
+
+    <div class="equipes-topo">
+      <button type="button" class="equipes-btn-voltar" onclick="equipesVoltarMenu()">&larr; Voltar ao Menu</button>
+      <div class="equipes-titulo-bloco">
+        <h2>Gestão de Equipes</h2>
+        <div class="equipes-data-operacao">
+          <span class="equipes-data-label" id="equipes_data_label">OPERAÇÃO DO DIA</span>
+          <span class="equipes-data-valor" id="equipes_data_hoje"></span>
+        </div>
+      </div>
+      <div style="width:140px;"></div>
+    </div>
+
+    <div class="equipes-subnav" role="tablist">
+      <button type="button" class="equipes-subnav-btn equipes-subnav-ativo" id="equipes_subnav_lista" role="tab" aria-selected="true">EQUIPES</button>
+      <button type="button" class="equipes-subnav-btn" id="equipes_subnav_mapa" role="tab" aria-selected="false">MAPA OPERACIONAL</button>
+    </div>
+
+    <div class="equipes-filtros">
+      <div class="equipes-campo">
+        <label for="equipes_filtro_polo">Polo</label>
+        <select id="equipes_filtro_polo">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="equipes-campo">
+        <label for="equipes_filtro_municipio">Município</label>
+        <select id="equipes_filtro_municipio">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="equipes-campo">
+        <label for="equipes_filtro_status">Status</label>
+        <select id="equipes_filtro_status">
+          <option value="">Todos</option>
+          <option value="DISPONIVEL">🟢 Disponível</option>
+          <option value="DESLOCAMENTO">🔵 Em deslocamento</option>
+          <option value="EM_ATENDIMENTO">🟡 Em atendimento</option>
+          <option value="NO_LOCAL">🟣 No local</option>
+          <option value="INDISPONIVEL">⚫ Indisponível</option>
+          <option value="FINALIZADA">🔴 Turno encerrado</option>
+        </select>
+      </div>
+      <div class="equipes-campo">
+        <label for="equipes_filtro_dia">Dia</label>
+        <select id="equipes_filtro_dia">
+          <option value="">Hoje</option>
+        </select>
+      </div>
+      <div class="equipes-campo">
+        <label for="equipes_filtro_busca">Buscar equipe</label>
+        <input type="search" id="equipes_filtro_busca" placeholder="🔎 Ex: AJU-PS01" autocomplete="off">
+      </div>
+      <div class="equipes-filtros-acoes">
+        <button type="button" class="equipes-btn-recuperar" id="equipes_btn_recuperar" hidden>↻ Recuperar equipes e roteiros do dia anterior</button>
+        <button type="button" class="equipes-btn-add" id="equipes_btn_adicionar">+ Adicionar Equipe</button>
+      </div>
+    </div>
+
+    <div class="equipes-erro" id="equipes_erro"></div>
+
+    <!-- ===== SUB-ABA: LISTA (tabela) ===== -->
+    <div id="equipes_painel_lista">
+      <div id="equipes_vazio" class="equipes-vazio" hidden>
+        <p>Nenhuma equipe encontrada para este filtro.</p>
+        <button type="button" id="equipes_btn_adicionar_primeira">+ Adicionar Primeira Equipe</button>
+      </div>
+
+      <div id="equipes_grid_wrap">
+        <div class="equipes-grid" id="equipes_grid"></div>
+      </div>
+    </div>
+
+    <!-- ===== SUB-ABA: MAPA OPERACIONAL ===== -->
+    <div id="equipes_painel_mapa" hidden>
+      <div class="mapa-layout">
+        <div class="mapa-container-wrap">
+          <div id="mapa_leaflet" class="mapa-leaflet"></div>
+          <div id="mapa_indisponivel" class="mapa-indisponivel" hidden>
+            Não foi possível carregar o mapa (biblioteca Leaflet indisponível). A lista de equipes abaixo continua funcionando normalmente.
+          </div>
+          <div class="mapa-legenda">
+            <span><span class="mapa-legenda-bolinha" style="background:#22c55e"></span> Disponível</span>
+            <span><span class="mapa-legenda-bolinha" style="background:#3b82f6"></span> Em deslocamento</span>
+            <span><span class="mapa-legenda-bolinha" style="background:#eab308"></span> Em atendimento</span>
+            <span><span class="mapa-legenda-bolinha" style="background:#a855f7"></span> No local</span>
+            <span><span class="mapa-legenda-bolinha" style="background:#334155"></span> Indisponível</span>
+            <span><span class="mapa-legenda-bolinha" style="background:#dc2626"></span> Turno encerrado</span>
+          </div>
+        </div>
+        <div class="mapa-sem-geo-wrap">
+          <div class="mapa-resumo-secao">
+            <h3>Resumo das equipes</h3>
+            <div id="mapa_resumo_contagem" class="mapa-resumo-contagem">0 equipes encontradas</div>
+            <div id="mapa_resumo_lista" class="mapa-resumo-lista"></div>
+          </div>
+
+          <div class="mapa-resumo-divisor"></div>
+
+          <h3>Sem geolocalização disponível</h3>
+          <p class="mapa-sem-geo-info">Equipes cuja posição ainda não tem coordenada/GeoJSON cadastrado — agrupadas por município, sem posição inventada no mapa.</p>
+          <div id="mapa_sem_geo_lista" class="mapa-sem-geo-lista"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: adicionar equipe à operação do dia -->
+<div id="equipes_modal_add" class="modal">
+  <div class="modal-content equipes-modal-content">
+    <span class="fechar" onclick="equipesFecharModal()">&times;</span>
+    <h2>Adicionar Equipe</h2>
+
+    <div class="equipes-form-erro" id="equipes_modal_erro"></div>
+
+    <div class="linha-2">
+      <div class="equipes-combo-campo">
+        <label for="equipes_form_polo">Polo da equipe <span class="equipes-hint">(regional de pertencimento — não é a posição atual)</span></label>
+        <div class="equipes-combo" id="equipes_combo_polo">
+          <input id="equipes_form_polo" type="text" autocomplete="off" placeholder="Selecionar ou digitar um polo">
+          <div class="equipes-combo-opcoes" id="equipes_polo_opcoes" hidden></div>
+        </div>
+      </div>
+      <div class="equipes-combo-campo">
+        <label for="equipes_form_identificador">Equipe</label>
+        <div class="equipes-combo" id="equipes_combo_equipe">
+          <input id="equipes_form_identificador" type="text" autocomplete="off" placeholder="Pesquisar ou digitar (ex: ARJ01)">
+          <div class="equipes-combo-opcoes" id="equipes_equipe_opcoes" hidden></div>
+        </div>
+      </div>
+    </div>
+
+    <label>Horário</label>
+    <div class="equipes-horario-presets" id="equipes_horario_presets">
+      <button type="button" class="equipes-horario-btn" data-inicio="00:00" data-fim="09:00">00:00–09:00</button>
+      <button type="button" class="equipes-horario-btn" data-inicio="04:00" data-fim="13:00">04:00–13:00</button>
+      <button type="button" class="equipes-horario-btn" data-inicio="06:00" data-fim="15:00">06:00–15:00</button>
+      <button type="button" class="equipes-horario-btn" data-inicio="07:30" data-fim="17:30">07:30–17:30</button>
+      <button type="button" class="equipes-horario-btn" data-inicio="10:00" data-fim="20:00">10:00–20:00</button>
+      <button type="button" class="equipes-horario-btn" data-inicio="12:00" data-fim="22:00">12:00–22:00</button>
+      <button type="button" class="equipes-horario-btn" data-inicio="15:00" data-fim="00:00">15:00–00:00</button>
+      <button type="button" class="equipes-horario-btn" id="equipes_horario_btn_outro" data-outro="true">Outro</button>
+    </div>
+    <div class="linha-2 equipes-horario-manual" id="equipes_horario_manual" hidden>
+      <div>
+        <label for="equipes_form_hora_inicio">Horário inicial</label>
+        <input id="equipes_form_hora_inicio" type="time">
+      </div>
+      <div>
+        <label for="equipes_form_hora_fim">Horário final</label>
+        <input id="equipes_form_hora_fim" type="time">
+      </div>
+    </div>
+    <div class="equipes-duracao" id="equipes_form_duracao">—</div>
+
+    <div class="linha-2">
+      <div>
+        <label for="equipes_form_telefone">Telefone <span class="equipes-hint">(opcional)</span></label>
+        <input id="equipes_form_telefone" placeholder="Ex: 79999999999">
+      </div>
+      <div id="equipes_campo_municipio" class="equipes-combo-campo" hidden>
+        <label for="equipes_form_municipio">Município</label>
+        <select id="equipes_form_municipio">
+          <option value="">Todos os municípios do polo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="linha-2">
+      <div>
+        <label for="equipes_form_viatura">Nº da viatura <span class="equipes-hint">(opcional)</span></label>
+        <input id="equipes_form_viatura" placeholder="Ex: VTR-42">
+      </div>
+      <div>
+        <label for="equipes_form_radio">Rádio</label>
+        <select id="equipes_form_radio">
+          <option value="">Não informado</option>
+          <option value="FUNCIONANDO">🟢 Funcionando</option>
+          <option value="NAO_FUNCIONANDO">🔴 Não funcionando</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Localidades de atuação <span class="equipes-hint">(opcional) — a primeira define a posição atual</span></label>
+    <div class="equipes-multi" id="equipes_multi_localidades">
+      <input type="text" id="equipes_localidades_busca" autocomplete="off" placeholder="🔎 Pesquisar localidade...">
+      <div class="equipes-multi-opcoes" id="equipes_localidades_opcoes" hidden></div>
+      <div class="equipes-chips" id="equipes_localidades_chips"></div>
+    </div>
+    <div class="equipes-posicao-derivada" id="equipes_posicao_derivada">
+      📍 Posição atual: <strong id="equipes_posicao_derivada_nome">Sem posição definida</strong>
+    </div>
+
+    <label>Cursos adicionais <span class="equipes-hint">(opcional) — ficam com a equipe, não só com hoje</span></label>
+    <div class="equipes-multi" id="equipes_multi_cursos">
+      <input type="text" id="equipes_cursos_busca" autocomplete="off" placeholder="🔎 Pesquisar ou digitar um curso novo...">
+      <div class="equipes-multi-opcoes" id="equipes_cursos_opcoes" hidden></div>
+      <div class="equipes-chips" id="equipes_cursos_chips"></div>
+    </div>
+
+    <div class="linha-2">
+      <div>
+        <label for="equipes_form_status">Status</label>
+        <select id="equipes_form_status">
+          <option value="DISPONIVEL">🟢 Disponível</option>
+          <option value="DESLOCAMENTO">🔵 Em deslocamento</option>
+          <option value="EM_ATENDIMENTO">🟡 Em atendimento</option>
+          <option value="NO_LOCAL">🟣 No local</option>
+          <option value="INDISPONIVEL">⚫ Indisponível</option>
+        </select>
+      </div>
+      <div></div>
+    </div>
+
+    <label for="equipes_form_observacao">Observação</label>
+    <textarea id="equipes_form_observacao" rows="3"></textarea>
+
+    <button type="button" id="equipes_btn_salvar">Salvar</button>
+  </div>
+</div>
+
+<!-- MODAL: alterar posição / áreas de atuação / status de uma operação já criada -->
+<div id="equipes_modal_alterar" class="modal">
+  <div class="modal-content equipes-modal-content">
+    <span class="fechar" onclick="equipesFecharModalAlterar()">&times;</span>
+    <h2 id="equipes_alterar_titulo">Alterar Posição</h2>
+    <p class="equipes-hint" id="equipes_alterar_subtitulo"></p>
+
+    <div class="equipes-form-erro" id="equipes_alterar_erro"></div>
+
+    <label>Nova posição atual</label>
+    <div class="linha-2">
+      <div class="equipes-combo-campo">
+        <label for="equipes_alterar_posicao_polo">Polo da posição</label>
+        <select id="equipes_alterar_posicao_polo">
+          <option value="">Selecione…</option>
+        </select>
+      </div>
+      <div class="equipes-combo-campo">
+        <label for="equipes_alterar_posicao_municipio">Município</label>
+        <select id="equipes_alterar_posicao_municipio" disabled>
+          <option value="">Selecione o polo primeiro…</option>
+        </select>
+      </div>
+    </div>
+    <div class="equipes-combo-campo">
+      <label for="equipes_alterar_posicao_busca">Localidade</label>
+      <div class="equipes-combo" id="equipes_combo_alterar_posicao">
+        <input id="equipes_alterar_posicao_busca" type="text" autocomplete="off" placeholder="🔎 Pesquisar localidade..." disabled>
+        <div class="equipes-combo-opcoes" id="equipes_alterar_posicao_opcoes" hidden></div>
+      </div>
+      <div class="equipes-chips" id="equipes_alterar_posicao_chip"></div>
+      <button type="button" class="equipes-btn-acao" id="equipes_btn_remover_posicao">Remover posição atual</button>
+    </div>
+
+    <label for="equipes_alterar_telefone">Telefone <span class="equipes-hint">(opcional)</span></label>
+    <input id="equipes_alterar_telefone" placeholder="Ex: 79999999999">
+
+    <label for="equipes_alterar_horario_select">Horário</label>
+    <select id="equipes_alterar_horario_select"></select>
+    <div class="linha-2 equipes-horario-manual" id="equipes_alterar_horario_manual" hidden>
+      <div>
+        <label for="equipes_alterar_hora_inicio">Início</label>
+        <input id="equipes_alterar_hora_inicio" type="time">
+      </div>
+      <div>
+        <label for="equipes_alterar_hora_fim">Fim</label>
+        <input id="equipes_alterar_hora_fim" type="time">
+      </div>
+    </div>
+
+    <div class="linha-2">
+      <div>
+        <label for="equipes_alterar_viatura">Nº da viatura <span class="equipes-hint">(opcional)</span></label>
+        <input id="equipes_alterar_viatura" placeholder="Ex: VTR-42">
+      </div>
+      <div>
+        <label for="equipes_alterar_radio">Rádio</label>
+        <select id="equipes_alterar_radio">
+          <option value="">Não informado</option>
+          <option value="FUNCIONANDO">🟢 Funcionando</option>
+          <option value="NAO_FUNCIONANDO">🔴 Não funcionando</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Áreas de atuação</label>
+    <div class="equipes-multi" id="equipes_multi_alterar_areas">
+      <input type="text" id="equipes_alterar_areas_busca" autocomplete="off" placeholder="🔎 Pesquisar localidade..." disabled>
+      <div class="equipes-multi-opcoes" id="equipes_alterar_areas_opcoes" hidden></div>
+      <div class="equipes-chips" id="equipes_alterar_areas_chips"></div>
+    </div>
+
+    <label>Operadores <span class="equipes-hint">(opcional)</span></label>
+    <div class="equipes-multi" id="equipes_multi_alterar_operadores">
+      <input type="text" id="equipes_alterar_operadores_busca" autocomplete="off" placeholder="🔎 Pesquisar operador...">
+      <div class="equipes-multi-opcoes" id="equipes_alterar_operadores_opcoes" hidden></div>
+      <div class="equipes-chips" id="equipes_alterar_operadores_chips"></div>
+    </div>
+
+    <label>Cursos adicionais <span class="equipes-hint">(ficam com a equipe, não só com hoje)</span></label>
+    <div class="equipes-multi" id="equipes_multi_alterar_cursos">
+      <input type="text" id="equipes_alterar_cursos_busca" autocomplete="off" placeholder="🔎 Pesquisar ou digitar um curso novo...">
+      <div class="equipes-multi-opcoes" id="equipes_alterar_cursos_opcoes" hidden></div>
+      <div class="equipes-chips" id="equipes_alterar_cursos_chips"></div>
+    </div>
+
+    <label for="equipes_alterar_status">Status</label>
+    <select id="equipes_alterar_status">
+      <option value="DISPONIVEL">🟢 Disponível</option>
+      <option value="DESLOCAMENTO">🔵 Em deslocamento</option>
+      <option value="EM_ATENDIMENTO">🟡 Em atendimento</option>
+      <option value="NO_LOCAL">🟣 No local</option>
+      <option value="INDISPONIVEL">⚫ Indisponível</option>
+    </select>
+
+    <button type="button" id="equipes_btn_salvar_alterar">Salvar Alteração</button>
+  </div>
+</div>
+
+<div id="equipes_modal_excluir" class="modal">
+  <div class="modal-content equipes-modal-content">
+    <span class="fechar" onclick="equipesFecharModalExcluir()">&times;</span>
+    <h2>Excluir equipe?</h2>
+    <p class="equipes-excluir-aviso">
+      Esta ação excluirá o cadastro operacional da equipe <strong id="equipes_excluir_identificador"></strong> e seus vínculos de operação.
+      O histórico/auditoria não será apagado.
+    </p>
+
+    <div class="equipes-form-erro" id="equipes_excluir_erro"></div>
+
+    <div class="equipes-excluir-botoes">
+      <button type="button" id="equipes_btn_cancelar_excluir" onclick="equipesFecharModalExcluir()">Cancelar</button>
+      <button type="button" id="equipes_btn_confirmar_excluir">Excluir equipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: recuperar equipes e roteiros do dia anterior -->
+<div id="equipes_modal_recuperar" class="modal">
+  <div class="modal-content equipes-modal-content">
+    <span class="fechar" onclick="equipesFecharModalRecuperar()">&times;</span>
+    <h2 id="equipes_recuperar_titulo">Recuperar operação do dia anterior</h2>
+
+    <div class="equipes-form-erro" id="equipes_recuperar_erro"></div>
+
+    <div class="equipes-recuperar-resumo" id="equipes_recuperar_resumo"></div>
+
+    <p class="equipes-recuperar-aviso">
+      As equipes já cadastradas hoje serão preservadas exatamente como estão — telefone, localidade, horário e
+      status atuais não são alterados. Só as equipes de ontem que ainda não têm operação hoje serão adicionadas.
+    </p>
+
+    <div class="equipes-excluir-botoes">
+      <button type="button" id="equipes_btn_cancelar_recuperar" onclick="equipesFecharModalRecuperar()">Cancelar</button>
+      <button type="button" id="equipes_btn_confirmar_recuperar">Recuperar equipes</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====///////////////// ADMINISTRAÇÃO (etapa 7) /////////////////// ===== -->
+<div id="administracao" class="module">
+  <div class="container">
+    <h2>Painel Administrativo</h2>
+
+    <div class="admin-tabs">
+      <button type="button" class="admin-tab-btn ativo" onclick="adminMostrarAba('dashboard', this)">Dashboard</button>
+      <button type="button" class="admin-tab-btn" onclick="adminMostrarAba('usuarios', this)">Usuários</button>
+      <button type="button" class="admin-tab-btn" onclick="adminMostrarAba('solicitacoes', this)">Solicitações de Acesso</button>
+      <button type="button" class="admin-tab-btn" onclick="adminMostrarAba('redefinicoes', this)">Redefinições de Senha</button>
+      <button type="button" class="admin-tab-btn" onclick="adminMostrarAba('auditoria', this)">Auditoria</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="admin-aba-dashboard" class="admin-aba ativo">
+      <div class="admin-erro" id="admin_dashboard_erro"></div>
+      <div class="admin-cards">
+        <div class="admin-card">
+          <span class="admin-card-valor" id="admin_kpi_ativos">-</span>
+          <span class="admin-card-label">Usuários ativos</span>
+        </div>
+        <div class="admin-card">
+          <span class="admin-card-valor" id="admin_kpi_pendentes">-</span>
+          <span class="admin-card-label">Usuários pendentes</span>
+        </div>
+        <div class="admin-card">
+          <span class="admin-card-valor" id="admin_kpi_bloqueados">-</span>
+          <span class="admin-card-label">Usuários bloqueados</span>
+        </div>
+        <div class="admin-card">
+          <span class="admin-card-valor" id="admin_kpi_solicitacoes">-</span>
+          <span class="admin-card-label">Solicitações de acesso pendentes</span>
+        </div>
+        <div class="admin-card">
+          <span class="admin-card-valor" id="admin_kpi_redefinicoes">-</span>
+          <span class="admin-card-label">Redefinições pendentes</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUÁRIOS -->
+    <div id="admin-aba-usuarios" class="admin-aba">
+      <div class="admin-filtros">
+        <input id="admin_users_filtro_nome" placeholder="Nome">
+        <input id="admin_users_filtro_login" placeholder="Login">
+        <select id="admin_users_filtro_perfil">
+          <option value="">Perfil (todos)</option>
+          <option value="OPERADOR">OPERADOR</option>
+          <option value="SUPERVISOR">SUPERVISOR</option>
+          <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+        </select>
+        <select id="admin_users_filtro_status">
+          <option value="">Status (todos)</option>
+          <option value="PENDENTE">PENDENTE</option>
+          <option value="ATIVO">ATIVO</option>
+          <option value="BLOQUEADO">BLOQUEADO</option>
+          <option value="INATIVO">INATIVO</option>
+        </select>
+        <button type="button" id="admin_users_btn_filtrar">Filtrar</button>
+      </div>
+      <div class="admin-erro" id="admin_users_erro"></div>
+      <div class="admin-tabela-wrap">
+        <table class="admin-tabela">
+          <thead><tr><th>Nome</th><th>Login</th><th>Perfis</th><th>Status</th><th>Último login</th><th>Ações</th></tr></thead>
+          <tbody id="admin_users_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SOLICITAÇÕES DE ACESSO -->
+    <div id="admin-aba-solicitacoes" class="admin-aba">
+      <div class="admin-erro" id="admin_solic_erro"></div>
+      <div class="admin-tabela-wrap">
+        <table class="admin-tabela">
+          <thead><tr><th>Nome</th><th>Matrícula</th><th>Login solicitado</th><th>E-mail</th><th>WhatsApp</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="admin_solic_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REDEFINIÇÕES DE SENHA -->
+    <div id="admin-aba-redefinicoes" class="admin-aba">
+      <div class="admin-erro" id="admin_redef_erro"></div>
+      <div class="admin-tabela-wrap">
+        <table class="admin-tabela">
+          <thead><tr><th>Usuário</th><th>Login</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody id="admin_redef_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AUDITORIA -->
+    <div id="admin-aba-auditoria" class="admin-aba">
+      <div class="admin-filtros">
+        <input id="admin_audit_filtro_acao" placeholder="Ação (ex: LOGIN)">
+        <input id="admin_audit_filtro_entidade" placeholder="Entidade (ex: usuarios)">
+        <button type="button" id="admin_audit_btn_filtrar">Filtrar</button>
+        <button type="button" id="admin_audit_btn_ordem">Ordem: mais recentes primeiro</button>
+      </div>
+      <div class="admin-erro" id="admin_audit_erro"></div>
+      <div class="admin-tabela-wrap">
+        <table class="admin-tabela">
+          <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Entidade</th><th>Entidade ID</th><th>Detalhes</th><th>IP</th></tr></thead>
+          <tbody id="admin_audit_tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: alterar perfis do usuário -->
+<div id="admin_modal_perfis" class="modal">
+  <div class="modal-content admin-modal-content">
+    <span class="fechar" onclick="adminFecharModalPerfis()">&times;</span>
+    <h2>Alterar perfis</h2>
+    <p id="admin_modal_perfis_usuario"></p>
+    <div class="admin-checkbox-lista" id="admin_modal_perfis_lista"></div>
+    <div class="admin-erro" id="admin_modal_perfis_erro"></div>
+    <button type="button" id="admin_modal_perfis_salvar">Salvar perfis</button>
+  </div>
+</div>
+
+<!-- MODAL: editar cadastro do usuário -->
+<div id="admin_modal_editar" class="modal">
+  <div class="modal-content admin-modal-content">
+    <span class="fechar" onclick="adminFecharModalEditarUsuario()">&times;</span>
+    <h2>Editar usuário</h2>
+
+    <label for="admin_modal_editar_nome">Nome</label>
+    <input id="admin_modal_editar_nome">
+
+    <label for="admin_modal_editar_login">Login</label>
+    <input id="admin_modal_editar_login">
+
+    <label for="admin_modal_editar_email">E-mail corporativo</label>
+    <input id="admin_modal_editar_email" type="email">
+
+    <label for="admin_modal_editar_whatsapp">Telefone/WhatsApp</label>
+    <input id="admin_modal_editar_whatsapp">
+
+    <label for="admin_modal_editar_matricula">Matrícula</label>
+    <input id="admin_modal_editar_matricula">
+
+    <div class="admin-erro" id="admin_modal_editar_erro"></div>
+    <button type="button" id="admin_modal_editar_salvar">Salvar alterações</button>
+  </div>
+</div>
+
+<!-- MODAL: motivo de rejeição (usado por solicitações de acesso e redefinições) -->
+<div id="admin_modal_rejeitar" class="modal">
+  <div class="modal-content admin-modal-content">
+    <span class="fechar" onclick="adminFecharModalRejeitar()">&times;</span>
+    <h2>Motivo da rejeição</h2>
+    <textarea id="admin_modal_rejeitar_motivo" rows="3" placeholder="Descreva o motivo (opcional)"></textarea>
+    <div class="admin-erro" id="admin_modal_rejeitar_erro"></div>
+    <button type="button" id="admin_modal_rejeitar_confirmar">Confirmar rejeição</button>
+  </div>
+</div>
+
+<!-- MODAL: aprovar solicitação de acesso (escolher perfil do novo usuário) -->
+<div id="admin_modal_aprovar_acesso" class="modal">
+  <div class="modal-content admin-modal-content">
+    <span class="fechar" onclick="adminFecharModalAprovarAcesso()">&times;</span>
+    <h2>Aprovar solicitação de acesso</h2>
+    <label for="admin_modal_aprovar_perfil">Perfil do novo usuário</label>
+    <select id="admin_modal_aprovar_perfil">
+      <option value="OPERADOR">OPERADOR</option>
+      <option value="SUPERVISOR">SUPERVISOR</option>
+      <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+    </select>
+    <div class="admin-erro" id="admin_modal_aprovar_erro"></div>
+    <button type="button" id="admin_modal_aprovar_confirmar">Aprovar</button>
+  </div>
+</div>
+
+<!-- MODAL: Meu Perfil (alterar a própria senha) -->
+<div id="perfil_modal_senha" class="modal">
+  <div class="modal-content admin-modal-content">
+    <span class="fechar" onclick="perfilFecharModalSenha()">&times;</span>
+    <h2>Meu Perfil — Alterar senha</h2>
+
+    <label for="perfil_senha_atual">Senha atual</label>
+    <input id="perfil_senha_atual" type="password" autocomplete="current-password">
+
+    <label for="perfil_senha_nova">Nova senha</label>
+    <input id="perfil_senha_nova" type="password" autocomplete="new-password">
+
+    <label for="perfil_senha_confirmar">Confirmar nova senha</label>
+    <input id="perfil_senha_confirmar" type="password" autocomplete="new-password">
+
+    <div class="login-erro" id="perfil_senha_erro"></div>
+    <div class="login-sucesso" id="perfil_senha_sucesso"></div>
+    <button type="button" id="perfil_senha_salvar">Salvar nova senha</button>
+  </div>
+</div>
+
+<!-- MODAL: auditoria de um usuário específico -->
+<div id="admin_modal_auditoria_usuario" class="modal">
+  <div class="modal-content admin-modal-content admin-modal-largo">
+    <span class="fechar" onclick="adminFecharModalAuditoriaUsuario()">&times;</span>
+    <h2 id="admin_modal_auditoria_usuario_titulo">Auditoria do usuário</h2>
+    <div class="admin-tabela-wrap">
+      <table class="admin-tabela">
+        <thead><tr><th>Data/Hora</th><th>Ação</th><th>Entidade</th><th>Detalhes</th><th>IP</th></tr></thead>
+        <tbody id="admin_modal_auditoria_usuario_tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: token de redefinição aprovado -->
+<div id="admin_modal_token" class="modal">
+  <div class="modal-content admin-modal-content">
+    <span class="fechar" onclick="adminFecharModalToken()">&times;</span>
+    <h2>Redefinição aprovada</h2>
+    <p>Envie este código ao usuário pelo canal interno de costume. Ele expira sozinho, só pode ser usado uma vez, e este é o único momento em que fica visível — não é possível recuperá-lo depois de fechar esta janela.</p>
+    <div class="admin-token-box" id="admin_modal_token_valor"></div>
+  </div>
+</div>
+
+<!-- MODAL TABELAS TÉCNICAS -->
+<div id="modalTabela" class="modal">
+    <div class="modal-content">
+
+        <span class="fechar" onclick="fecharTabela()">&times;</span>
+
+        <h2>Tabelas Técnicas</h2>
+
+    </div>
+</div>
+
+    
+<script>
+// VERSÃO DEMONSTRATIVA: a URL real (Microsoft Forms interno da Energisa,
+// usado pela equipe do COI para o formulário de passagem de turno) foi
+// removida por segurança desta cópia pública — nunca substituída por uma
+// versão parcial/ofuscada, o link real não existe mais neste arquivo.
+// Placeholder documentado abaixo só como exemplo de onde um link real
+// entraria numa instância própria; nunca é de fato aberto por esta demo.
+const COI_DEMO_LINK_PASSAGEM_TURNO_PLACEHOLDER = "https://example.com/microsoft-forms-configurar";
+function abrirTurno(){
+  showToast("Link do formulário não configurado no demo público.");
+}
+</script>
+<div class="footer-global">
+  <div class="footer-left">
+    <div class="coi-wordmark coi-wordmark--sm" role="img" aria-label="COI Sergipe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+      <span class="coi-wordmark-texto">COI<span>SERGIPE</span></span>
+    </div>
+  </div>
+
+  <div class="footer-center">
+    <div class="footer-status">
+      <span class="dot"></span>
+      <span class="status-text">ONLINE</span>
+    </div>
+
+    <div class="footer-msg">
+      🔒 Sistema desenvolvido por Thiago Araujo • COI SERGIPE
+    </div>
+  </div>
+
+  <div class="auth-usuario-badge" id="auth_usuario_badge">
+    <span class="auth-usuario-nome" id="auth_usuario_nome"></span>
+    <button type="button" class="auth-usuario-perfil" id="auth_btn_meu_perfil">Meu Perfil</button>
+    <button type="button" class="auth-usuario-sair" id="auth_btn_sair">Sair</button>
+  </div>
+
+</div>
+<!-- VERSÃO DEMONSTRATIVA: precisa carregar ANTES de qualquer outro script —
+     intercepta window.fetch para simular o backend (ver js/demo-backend.js). -->
+<script src="js/demo-backend.js"></script>
+<script src="js/core.js"></script>
+<script src="js/menu-sidebar.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/equipes.js"></script>
+<script src="js/mapa.js"></script>
+<script src="js/mensagens.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/historico.js"></script>
+<script src="js/callback-whatsapp.js"></script>
+<script src="js/utilitarios.js"></script>
+<!-- MAPAS DAS REGIONAIS: módulo novo e independente, carregado depois de
+     js/mapa.js de propósito — não depende dele, só evita qualquer dúvida
+     de ordem (ver js/mapas-regionais.js). -->
+<script src="js/mapas-regionais.js"></script>
+<!-- PENDÊNCIAS (Fase 3, etapa 4): compartilhada por polo, sobre a API de
+     backend/app/routers/pendencias.py (etapa 3) — ver js/pendencias.js. -->
+<script src="js/pendencias.js"></script>
+<!-- PASSAGEM DE TURNO (Fase 4, etapa 4): compartilhada por polo, sobre a
+     API de backend/app/routers/passagem_turno.py (etapa 3) — ver
+     js/passagem-turno.js. -->
+<script src="js/passagem-turno.js"></script>
+<!-- HISTÓRICO DE PASSAGEM DE TURNO (Fase 6): admin/supervisor, somente
+     leitura, sobre GET /api/passagens-turno/historico* — ver
+     js/passagem-turno-historico.js. Carregado depois de passagem-turno.js
+     de propósito (mesma ordem de dependência conceitual), mas é um
+     arquivo independente, sem função em comum com ele. -->
+<script src="js/passagem-turno-historico.js"></script>
+<!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup, um
+     arquivo por ferramenta, cada um isolado (ver auditoria). -->
+<script src="js/scripts-campo/bloqueios.js"></script>
+<script src="js/scripts-campo/sinergia.js"></script>
+<script src="js/scripts-campo/desarme.js"></script>
+<script src="js/scripts-campo/preenchimento-ss.js"></script>
+<script src="js/scripts-campo/substituicao-poste.js"></script>
+<script src="js/scripts-campo/substituicao-transformador.js"></script>
+
+
+<script>
+function abrirTabela() {
+    document.getElementById("modalTabela").style.display = "flex";
+}
+
+function fecharTabela() {
+    document.getElementById("modalTabela").style.display = "none";
+}
+
+</script>
+
+
+<!-- MODAL MAPA -->
+<div id="modal-mapa" class="modal-mapa" onclick="fecharMapa(event)">
+  <img id="modal-img" alt="Mapa ampliado" onclick="event.stopPropagation()">
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

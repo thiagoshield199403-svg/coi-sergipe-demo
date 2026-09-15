@@ -1,0 +1,179 @@
+/* ===== PAINEL ADMINISTRATIVO (etapa 7) =====
+   Arquivo carregado depois de styles.css — usa os mesmos custom properties,
+   sempre com fallback, seguindo o padrão de css/auth.css. */
+
+.admin-tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:4px 0 18px;
+  border-bottom:1px solid var(--border, rgba(15,23,42,.09));
+  padding-bottom:12px;
+}
+
+.admin-tab-btn{
+  width:auto;
+  margin:0;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text-secondary, #566072);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+}
+.admin-tab-btn:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+.admin-tab-btn.ativo{
+  background: var(--accent, #0b5394);
+  color:#fff;
+  border-color: var(--accent, #0b5394);
+}
+
+.admin-aba{ display:none; }
+.admin-aba.ativo{ display:block; }
+
+.admin-cards{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap:14px;
+}
+
+.admin-card{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  background: var(--surface-alt, #f7f9fb);
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  border-left:3px solid var(--accent, #0b5394);
+  border-radius: var(--radius-md, 10px);
+  padding:16px 18px;
+}
+.admin-card-valor{ font-size:28px; font-weight:700; color: var(--text, #1a2130); }
+.admin-card-label{ font-size:12.5px; color: var(--text-secondary, #566072); font-weight:600; }
+
+.admin-filtros{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:14px;
+  align-items:center;
+}
+.admin-filtros input,
+.admin-filtros select{
+  width:auto;
+  min-width:140px;
+  margin:0;
+}
+.admin-filtros button{ width:auto; margin:0; }
+
+.admin-erro{
+  display:none;
+  font-size:13px;
+  font-weight:600;
+  padding:9px 12px;
+  border-radius: var(--radius-sm, 6px);
+  margin-bottom:12px;
+  background: rgba(220,38,38,.1);
+  border:1px solid rgba(220,38,38,.3);
+  color: var(--danger, #dc2626);
+}
+
+.admin-tabela-wrap{
+  overflow-x:auto;
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  border-radius: var(--radius-md, 10px);
+}
+
+.admin-tabela{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  white-space:nowrap;
+}
+.admin-tabela th,
+.admin-tabela td{
+  text-align:left;
+  padding:10px 12px;
+  border-bottom:1px solid var(--border, rgba(15,23,42,.09));
+}
+.admin-tabela th{
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text-secondary, #566072);
+  font-weight:700;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+}
+.admin-tabela tbody tr:hover{ background: var(--accent-soft, rgba(11,83,148,.06)); }
+.admin-tabela td{ white-space:normal; }
+
+.admin-acoes{ display:flex; flex-wrap:wrap; gap:6px; }
+
+.admin-btn-acao{
+  width:auto;
+  margin:0;
+  padding:5px 10px;
+  font-size:12px;
+  background: var(--surface, #fff);
+  color: var(--accent, #0b5394);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-sm, 6px);
+}
+.admin-btn-acao:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+
+.admin-motivo{
+  font-size:12px;
+  color: var(--text-muted, #8993a4);
+  font-style:italic;
+}
+
+.admin-badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.02em;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text-secondary, #566072);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+}
+.admin-badge-ok{ background: rgba(22,163,74,.1); color: var(--success, #16a34a); border-color: rgba(22,163,74,.3); }
+.admin-badge-pendente{ background: rgba(217,119,6,.1); color: var(--warning, #d97706); border-color: rgba(217,119,6,.3); }
+.admin-badge-bloqueado{ background: rgba(220,38,38,.1); color: var(--danger, #dc2626); border-color: rgba(220,38,38,.3); }
+.admin-badge-inativo{ background: rgba(15,23,42,.08); color: var(--text-muted, #8993a4); border-color: var(--border-strong, rgba(15,23,42,.14)); }
+
+.admin-checkbox-lista{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin:14px 0;
+}
+.admin-checkbox-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:600;
+  font-size:14px;
+  color: var(--text, #1a2130);
+  cursor:pointer;
+}
+.admin-checkbox-item input{ width:auto; margin:0; }
+
+.admin-modal-content{ max-width:480px; }
+.admin-modal-largo{ max-width:760px; }
+
+.admin-token-box{
+  margin-top:12px;
+  padding:14px;
+  background: var(--surface-alt, #f7f9fb);
+  border:1px dashed var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+  font-family: "Courier New", monospace;
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.03em;
+  word-break:break-all;
+  color: var(--text, #1a2130);
+  user-select:all;
+}

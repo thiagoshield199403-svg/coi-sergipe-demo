@@ -1,0 +1,693 @@
+/* ===== GESTÃO DE EQUIPES V1 (etapa 8b) =====
+   Arquivo carregado depois de styles.css — usa os mesmos custom properties,
+   sempre com fallback, seguindo o padrão de css/admin.css. */
+
+#equipes .container{
+  max-width:none;
+}
+
+/* ---- TELA AMPLA (etapa "central operacional") ----
+   Ativada por js/core.js::openModule() sempre que a Gestão de Equipes está
+   aberta (body.modo-tela-ampla) — não é opt-in manual: com 30-50 equipes a
+   lista precisa da largura toda por padrão. Some com a sidebar (o menu
+   volta ao normal em qualquer outro módulo, inclusive Início — o botão
+   "← Voltar ao Menu" já existente é o caminho de volta) e adapta o rodapé
+   fixo, que hoje começa depois da sidebar (--sidebar-width). Nenhuma regra
+   aqui é específica de OUTRO módulo — só reage à classe no body. */
+body.modo-tela-ampla .sidebar{
+  display:none;
+}
+body.modo-tela-ampla .footer-global{
+  left:0;
+}
+body.modo-tela-ampla .content{
+  padding:16px 20px 72px;
+}
+body.modo-tela-ampla #equipes .container{
+  padding:20px 24px;
+}
+
+.equipes-topo{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.equipes-btn-voltar{
+  width:auto;
+  margin:0;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text-secondary, #566072);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+}
+.equipes-btn-voltar:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+
+.equipes-titulo-bloco{
+  flex:1;
+  min-width:220px;
+  text-align:center;
+}
+.equipes-titulo-bloco h2{ margin-bottom:6px; }
+
+.equipes-data-operacao{
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:8px;
+  font-weight:600;
+}
+.equipes-data-label{
+  font-size:11.5px;
+  letter-spacing:.05em;
+  color: var(--text-muted, #8993a4);
+}
+.equipes-data-valor{
+  font-size:15px;
+  color: var(--accent, #0b5394);
+}
+
+.equipes-filtros{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:12px;
+  margin-bottom:16px;
+}
+.equipes-filtros .equipes-campo{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.equipes-filtros label{ margin-top:0; }
+.equipes-filtros select{ width:auto; min-width:200px; margin-top:0; }
+.equipes-filtros input[type="search"]{ width:auto; min-width:200px; margin-top:0; }
+
+.equipes-filtros-acoes{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 0 auto;
+}
+
+.equipes-btn-add{
+  width:auto;
+  margin:0;
+  padding:9px 18px;
+  font-weight:700;
+  background: var(--accent, #0b5394);
+  color:#fff;
+  border-color: var(--accent, #0b5394);
+}
+.equipes-btn-add:hover{ filter:brightness(1.08); }
+
+/* "↻ Recuperar equipes do dia anterior" — só visível quando um polo
+   específico está selecionado e o dia é hoje (ver
+   equipesAtualizarVisibilidadeBotaoRecuperar em js/equipes.js). Discreto,
+   não compete com o "+ Adicionar Equipe" (ação primária). */
+.equipes-btn-recuperar{
+  width:auto;
+  margin:0;
+  padding:9px 16px;
+  font-weight:600;
+  font-size:13px;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--accent, #0b5394);
+  border:1px solid var(--accent, #0b5394);
+}
+.equipes-btn-recuperar:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+.equipes-btn-recuperar[hidden]{ display:none; }
+
+.equipes-recuperar-resumo{
+  margin:14px 0;
+  padding:12px 14px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-alt, #f7f9fb);
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  font-size:13.5px;
+  line-height:1.7;
+}
+.equipes-recuperar-resumo strong{ color: var(--accent, #0b5394); }
+
+.equipes-recuperar-aviso{
+  font-size:12.5px;
+  color: var(--text-muted, #8993a4);
+  line-height:1.5;
+  margin-bottom:18px;
+}
+
+.equipes-erro{
+  display:none;
+  font-size:13px;
+  font-weight:600;
+  padding:9px 12px;
+  border-radius: var(--radius-sm, 6px);
+  margin-bottom:12px;
+  background: rgba(220,38,38,.1);
+  border:1px solid rgba(220,38,38,.3);
+  color: var(--danger, #dc2626);
+}
+
+.equipes-vazio{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  padding:48px 20px;
+  color: var(--text-secondary, #566072);
+  border:1px dashed var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+}
+.equipes-vazio button{ width:auto; padding:10px 20px; }
+.equipes-vazio[hidden],
+#equipes_grid_wrap[hidden]{ display:none; }
+
+/* ---- CENTRAL OPERACIONAL: grid de blocos/família + cards compactos ----
+   Substitui a tabela vertical única (não escala visualmente além de ~15
+   equipes). Duas camadas de grid:
+   1) .equipes-grid — uma célula por família (prefixo do identificador,
+      ver equipesAgruparOperacoes em js/equipes.js), quantas colunas
+      couberem na largura (auto-fill), nunca um número fixo;
+   2) .equipes-grupo-lista — dentro de cada bloco, os cards empilham
+      verticalmente e rolam se a família crescer muito (limite de altura,
+      não de quantidade — nenhuma equipe fica oculta, só precisa rolar). */
+.equipes-grid{
+  display:grid;
+  /* 440px é o mínimo real pra uma .equipe-linha do cadastro rápido em linha
+     (status + equipe + telefone + localidade + horário + ações, todos
+     controles editáveis, não só texto) caber numa linha só sem forçar
+     rolagem horizontal dentro do bloco — 320px (herdado de quando a linha
+     era só leitura) não cabe mais os controles de horário/localidade. */
+  grid-template-columns:repeat(auto-fill, minmax(440px, 1fr));
+  gap:14px;
+  align-items:start;
+}
+
+.equipes-grupo{
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface, #fff);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.equipes-grupo-cabecalho{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px 12px;
+  background: var(--surface-alt, #f7f9fb);
+  border-bottom:1px solid var(--border, rgba(15,23,42,.09));
+}
+.equipes-grupo-titulo{
+  font-weight:700;
+  font-size:12.5px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  color: var(--text-secondary, #566072);
+}
+.equipes-grupo-contagem{
+  font-size:11.5px;
+  font-weight:700;
+  color: var(--text-muted, #8993a4);
+  background: var(--border, rgba(15,23,42,.09));
+  border-radius:999px;
+  padding:1px 8px;
+}
+
+.equipes-grupo-lista{
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+  max-height:min(58vh, 620px);
+  overflow-y:auto;
+  background: var(--border, rgba(15,23,42,.09)); /* linhas de separação via gap+bg, sem borda em cada card */
+}
+
+/* ---- Linha única compacta de uma equipe (item 10, etapa 3) ----
+   Uma linha fina só: [STATUS] EQUIPE | TELEFONE | LOCAL — tudo o mais
+   (município completo, polo, horário, áreas de atuação, operadores,
+   observação) vive só no tooltip nativo (equipesTituloLinha, hover) pra
+   não inflar a linha. Grid de colunas fixas + uma flexível (local), nunca
+   quebra em mais de uma linha (overflow -> reticências). */
+.equipe-linha{
+  display:grid;
+  /* minmax(0, Npx) — não minmax(Npx, auto) — de propósito: com "auto" como
+     teto a coluna cresce pro tamanho do CONTEÚDO (ignora a largura real do
+     bloco) e a linha inteira passa a exigir rolagem horizontal dentro do
+     card; com "0" como piso cada coluna pode encolher até o
+     overflow:hidden/text-overflow:ellipsis do próprio elemento assumir.
+     5 colunas de conteúdo agora (cadastro rápido em linha, etapa "central
+     operacional de cadastro rápido"): status | equipe | telefone |
+     localidade | horário | ações. */
+  grid-template-columns:18px minmax(0, 82px) 92px minmax(90px, 1fr) 100px auto;
+  align-items:center;
+  gap:6px;
+  background: var(--surface, #fff);
+  padding:5px 10px;
+  font-size:12.5px;
+  line-height:1.3;
+  cursor:default;
+}
+.equipe-linha:hover{ background: var(--accent-soft, rgba(11,83,148,.06)); }
+
+/* Linha ainda sem operacao_id (rascunho recém-aberto por "+ Adicionar
+   equipe") — só existe no cliente até o identificador ser confirmado, ver
+   equipesLinhaTentarCriar em js/equipes.js. */
+.equipe-linha-rascunho{
+  background: var(--accent-soft, rgba(11,83,148,.05));
+}
+
+/* Bloco escalado (config do polo) sem nenhuma equipe ainda — mensagem
+   discreta no lugar das linhas, "+ Adicionar equipe" continua disponível
+   logo abaixo (ver equipesRenderizarGrupo). */
+.equipes-grupo-vazio{
+  padding:14px 10px;
+  font-size:12px;
+  font-style:italic;
+  text-align:center;
+  color: var(--text-muted, #8993a4);
+}
+
+/* ---- Campos editáveis inline (cadastro rápido em linha) ----
+   Mesma altura/fonte discreta em todos, pra não quebrar o alinhamento da
+   linha compacta; borda só aparece no foco (menos ruído visual quando a
+   grade tem muitas linhas). */
+.equipe-linha-input,
+.equipe-linha-horario-select{
+  width:100%;
+  margin:0;
+  padding:3px 6px;
+  font-size:12.5px;
+  line-height:1.3;
+  border:1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  background:transparent;
+  color: var(--text, #1a2130);
+}
+.equipe-linha-input:hover,
+.equipe-linha-horario-select:hover{
+  border-color: var(--border, rgba(15,23,42,.09));
+  background: var(--surface, #fff);
+}
+.equipe-linha-input:focus,
+.equipe-linha-horario-select:focus{
+  border-color: var(--accent, #0b5394);
+  background: var(--surface, #fff);
+  outline:none;
+}
+.equipe-linha-input::placeholder{ color: var(--text-muted, #8993a4); }
+
+.equipe-linha-equipe-combo,
+.equipe-linha-local-combo{ position:relative; min-width:0; }
+
+.equipe-linha-horario{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+}
+.equipe-linha-horario-custom{
+  display:flex;
+  align-items:center;
+  gap:3px;
+}
+.equipe-linha-horario-custom[hidden]{ display:none; }
+.equipe-linha-horario-custom-input{
+  width:100%;
+  min-width:0;
+  padding:2px 4px;
+  font-size:11.5px;
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  border-radius: var(--radius-sm, 6px);
+}
+
+.equipe-linha-status{
+  font-size:11px;
+  text-align:center;
+}
+
+.equipe-linha-id{
+  font-weight:700;
+  font-size:13px;
+  color: var(--text, #1a2130);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  cursor:pointer; /* dblclick abre o cadastro avançado, ver equipesConstruirLinha */
+}
+
+.equipe-linha-tel,
+.equipe-linha-local{
+  color: var(--text-secondary, #566072);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.equipe-linha-vazia{ color: var(--text-muted, #8993a4); font-style:italic; }
+
+.equipe-linha-acoes{
+  display:flex;
+  gap:4px;
+  flex-shrink:0;
+}
+.equipe-linha-btn-icone{
+  width:auto;
+  margin:0;
+  padding:2px 6px;
+  font-size:12px;
+  line-height:1.5;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--accent, #0b5394);
+  border:1px solid var(--accent, #0b5394);
+  border-radius: var(--radius-sm, 6px);
+}
+.equipe-linha-btn-icone:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+.equipe-linha-btn-icone-perigo{
+  color: var(--danger, #dc2626);
+  border-color: var(--danger, #dc2626);
+}
+.equipe-linha-btn-icone-perigo:hover{ background: rgba(220,38,38,.08); }
+
+.equipe-linha-encerrado{ background: rgba(220,38,38,.06); }
+.equipe-linha-encerrado:hover{ background: rgba(220,38,38,.1); }
+.equipe-linha-encerrado .equipe-linha-id{ color: var(--danger, #dc2626); }
+
+/* Gatilho de "+ Adicionar equipe" DENTRO de um bloco/família (item 4 da
+   central operacional) — fora de .equipes-grupo-lista de propósito (essa
+   rola, este botão fica sempre visível no rodapé do bloco). Discreto, não
+   compete visualmente com .equipes-btn-add (topo, cadastro avançado). */
+.equipes-linha-add{
+  width:100%;
+  margin:0;
+  padding:7px 10px;
+  font-size:12px;
+  font-weight:600;
+  text-align:center;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--accent, #0b5394);
+  border:none;
+  border-top:1px solid var(--border, rgba(15,23,42,.09));
+  border-radius:0;
+}
+.equipes-linha-add:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+
+.equipes-badge-status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-weight:700;
+  font-size:12.5px;
+}
+
+/* ---- Modal: Adicionar Equipe ---- */
+
+.equipes-modal-content{ max-width:640px; }
+
+.equipes-form-erro{
+  display:none;
+  font-size:13px;
+  font-weight:600;
+  padding:9px 12px;
+  border-radius: var(--radius-sm, 6px);
+  margin-bottom:12px;
+  background: rgba(220,38,38,.1);
+  border:1px solid rgba(220,38,38,.3);
+  color: var(--danger, #dc2626);
+}
+
+.equipes-duracao{
+  margin-top:10px;
+  padding:9px 10px;
+  border-radius: var(--radius-sm, 6px);
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text, #1a2130);
+  font-weight:600;
+  font-size:13.5px;
+  text-align:center;
+}
+
+/* Posição atual DERIVADA da primeira localidade selecionada (cadastro
+   rápido) — nunca um campo editável separado, só informação de retorno. */
+.equipes-posicao-derivada{
+  margin-top:10px;
+  padding:9px 12px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--accent-soft, rgba(11,83,148,.10));
+  color: var(--accent, #0b5394);
+  font-size:13.5px;
+}
+.equipes-posicao-derivada[hidden]{ display:none; }
+
+.equipes-horario-manual[hidden]{ display:none; }
+
+/* ---- Combobox: Polo / Equipe (seleção rápida + digitação livre) ---- */
+
+.equipes-combo-campo{ position:relative; }
+
+.equipes-combo{ position:relative; }
+
+.equipes-combo-opcoes{
+  position:absolute;
+  z-index:20;
+  top:100%;
+  left:0;
+  right:0;
+  margin-top:2px;
+  max-height:220px;
+  overflow-y:auto;
+  background: var(--surface, #fff);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-md, 0 8px 24px -8px rgba(15,23,42,.22));
+}
+.equipes-combo-opcoes[hidden]{ display:none; }
+
+.equipes-combo-opcao{
+  padding:9px 12px;
+  font-size:13.5px;
+  cursor:pointer;
+  color: var(--text, #1a2130);
+}
+.equipes-combo-opcao:hover,
+.equipes-combo-opcao.equipes-opcao-destaque{
+  background: var(--accent-soft, rgba(11,83,148,.10));
+}
+.equipes-combo-opcao-vazia{
+  padding:9px 12px;
+  font-size:13px;
+  color: var(--text-muted, #8993a4);
+  font-style:italic;
+}
+.equipes-combo-opcao-sub{
+  color: var(--text-muted, #8993a4);
+  font-size:12px;
+  margin-left:6px;
+}
+
+/* ---- Horário: opções prontas em um clique ---- */
+
+.equipes-horario-presets{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:6px;
+  margin-bottom:6px;
+}
+
+.equipes-horario-btn{
+  width:auto;
+  margin:0;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:600;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text, #1a2130);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+}
+.equipes-horario-btn:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+.equipes-horario-btn.equipes-horario-ativo{
+  background: var(--accent, #0b5394);
+  color:#fff;
+  border-color: var(--accent, #0b5394);
+}
+
+/* ---- Multi-seleção com busca + chips: Localidades / Operadores ---- */
+
+.equipes-multi{ position:relative; margin-top:6px; }
+
+.equipes-multi-opcoes{
+  position:absolute;
+  z-index:20;
+  top:100%;
+  left:0;
+  right:0;
+  margin-top:2px;
+  max-height:220px;
+  overflow-y:auto;
+  background: var(--surface, #fff);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  border-radius: var(--radius-md, 10px);
+  box-shadow: var(--shadow-md, 0 8px 24px -8px rgba(15,23,42,.22));
+}
+.equipes-multi-opcoes[hidden]{ display:none; }
+
+.equipes-multi-opcao{
+  padding:9px 12px;
+  font-size:13.5px;
+  cursor:pointer;
+  color: var(--text, #1a2130);
+}
+.equipes-multi-opcao:hover,
+.equipes-multi-opcao.equipes-opcao-destaque{
+  background: var(--accent-soft, rgba(11,83,148,.10));
+}
+.equipes-multi-opcao-vazia{
+  padding:9px 12px;
+  font-size:13px;
+  color: var(--text-muted, #8993a4);
+  font-style:italic;
+}
+
+.equipes-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+.equipes-chips:empty{ margin-top:0; }
+
+.equipes-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px 5px 12px;
+  background: var(--accent-soft, rgba(11,83,148,.10));
+  color: var(--accent, #0b5394);
+  border:1px solid var(--accent, #0b5394);
+  border-radius:999px;
+  font-size:12.5px;
+  font-weight:600;
+}
+.equipes-chip-remover{
+  width:auto;
+  margin:0;
+  padding:0 4px;
+  border:none;
+  background:transparent;
+  color:inherit;
+  font-size:15px;
+  line-height:1;
+  cursor:pointer;
+}
+.equipes-chip-remover:hover{ color: var(--danger, #dc2626); }
+
+/* ---- MAPA OPERACIONAL: sub-navegação [ EQUIPES ] [ MAPA OPERACIONAL ] ---- */
+
+.equipes-subnav{
+  display:flex;
+  gap:8px;
+  margin-bottom:16px;
+  border-bottom:1px solid var(--border, rgba(15,23,42,.09));
+}
+.equipes-subnav-btn{
+  width:auto;
+  margin:0;
+  padding:10px 18px;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:.03em;
+  background:transparent;
+  color: var(--text-secondary, #566072);
+  border:none;
+  border-bottom:3px solid transparent;
+  border-radius:0;
+}
+.equipes-subnav-btn:hover{ color: var(--accent, #0b5394); }
+.equipes-subnav-btn.equipes-subnav-ativo{
+  color: var(--accent, #0b5394);
+  border-bottom-color: var(--accent, #0b5394);
+}
+
+.equipes-hint{
+  font-weight:400;
+  font-size:12px;
+  color: var(--text-muted, #8993a4);
+  text-transform:none;
+  letter-spacing:normal;
+}
+
+/* ---- Ações por linha (ex.: [ ALTERAR POSIÇÃO ]) ---- */
+
+.equipes-btn-acao{
+  width:auto;
+  margin:0;
+  padding:6px 12px;
+  font-size:12px;
+  font-weight:700;
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--accent, #0b5394);
+  border:1px solid var(--accent, #0b5394);
+  border-radius: var(--radius-sm, 6px);
+}
+.equipes-btn-acao:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+
+.equipes-acoes-linha{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.equipes-btn-acao-perigo{
+  color: var(--danger, #dc2626);
+  border-color: var(--danger, #dc2626);
+}
+.equipes-btn-acao-perigo:hover{ background: rgba(220,38,38,.08); }
+
+/* ---- Modal de confirmação de exclusão ---- */
+
+.equipes-excluir-aviso{
+  font-size:14px;
+  color: var(--text-muted, #565f6d);
+  margin: 8px 0 20px;
+  line-height:1.5;
+}
+.equipes-excluir-botoes{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+.equipes-excluir-botoes button{
+  width:auto;
+  margin:0;
+}
+#equipes_btn_confirmar_excluir{
+  background: var(--danger, #dc2626);
+}
+#equipes_btn_confirmar_excluir:hover{ background:#b91c1c; }
+#equipes_btn_cancelar_excluir{
+  background: var(--surface-alt, #f7f9fb);
+  color: var(--text, #1f2937);
+  border:1px solid var(--border, #d8dee6);
+}
+
+/* ---- TURNO ENCERRADO: vermelho não é status/ocorrência, é aviso de horário ----
+   .equipe-linha-encerrado (linha compacta) já declarada acima, junto do
+   resto da linha — mantida junto por ser variante do mesmo componente. */
+.equipes-identificador-encerrado{
+  color: var(--danger, #dc2626) !important;
+}
+.equipes-badge-turno-encerrado{
+  color: var(--danger, #dc2626);
+  font-weight:700;
+}

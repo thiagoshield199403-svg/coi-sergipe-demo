@@ -1,0 +1,356 @@
+/* ================= MAPAS DAS REGIONAIS (regtm-*) =================
+   Módulo independente do MAPA OPERACIONAL da Gestão de Equipes
+   (js/mapa.js / css/mapa.css) — NÃO reaproveita nenhuma classe de lá.
+   Todas as classes aqui usam o prefixo "regtm-" de propósito, para nunca
+   colidir com ".mapa-*"/".equipes-*" nem com nada do restante do sistema.
+
+   Fase 1: layout base (seletor de regional, área do mapa, painel
+   lateral). Fase 3: cores determinísticas por território, labels sobre o
+   mapa e legenda lateral interativa — ver seções abaixo. */
+
+.regtm-layout {
+  display: flex;
+  gap: 16px;
+  /* flex-wrap NUNCA no desktop (ver ajuste visual pós-Fase 3: a legenda
+     não pode cair para baixo do mapa) — só entra dentro do media query de
+     tela pequena, abaixo. */
+  align-items: stretch;
+}
+
+.regtm-topo {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.regtm-campo-seletor label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: var(--text-secondary, #566072);
+}
+
+.regtm-select {
+  min-width: 260px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-strong, rgba(15, 23, 42, .14));
+  font-size: 14px;
+  background: var(--surface, #fff);
+}
+
+.regtm-selecao-indicador {
+  font-size: 13px;
+  color: var(--text-secondary, #566072);
+  padding: 8px 12px;
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface-alt, #f7f9fb);
+  border: 1px solid var(--border, rgba(15, 23, 42, .09));
+}
+
+.regtm-selecao-indicador[data-regtm-vazio="true"] {
+  font-style: italic;
+}
+
+.regtm-mapa-wrap {
+  /* Proporção mapa/legenda ~84%/16% (ajuste de acabamento — antes 78%/20%),
+     mesma ideia de "mapa grande, legenda só o necessário". */
+  flex: 1 1 84%;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  /* Altura útil aumentada (era calc(100vh - 300px)/480px) — este módulo
+     não tem a barra de sub-abas nem a linha de 5 filtros da Gestão de
+     Equipes acima do mapa, só título+seletor, então sobra mais espaço
+     vertical sem invadir rodapé/menu. */
+  height: calc(100vh - 260px);
+  min-height: 520px;
+}
+
+.regtm-mapa {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-strong, rgba(15, 23, 42, .14));
+  background: var(--surface-alt, #f7f9fb);
+}
+
+.regtm-painel-lateral {
+  flex: 0 1 16%;
+  min-width: 230px;
+  max-width: 300px;
+  border: 1px solid var(--border, rgba(15, 23, 42, .09));
+  border-radius: var(--radius-md, 10px);
+  padding: 14px 16px;
+  background: var(--surface, #fff);
+  height: calc(100vh - 260px);
+  min-height: 520px;
+  overflow-y: auto;
+}
+
+.regtm-painel-lateral h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.regtm-painel-vazio {
+  font-size: 13px;
+  color: var(--text-secondary, #566072);
+  font-style: italic;
+}
+
+@media (max-width: 860px) {
+  .regtm-layout {
+    flex-wrap: wrap;
+  }
+
+  .regtm-mapa-wrap {
+    flex-basis: 100%;
+    height: 380px;
+    min-height: 380px;
+  }
+
+  .regtm-painel-lateral {
+    flex-basis: 100%;
+    max-width: none;
+    height: auto;
+    max-height: 320px;
+  }
+}
+
+/* Popup de clique num território — estilo simples, sem sobrepor/alterar
+   nenhuma classe de popup do mapa operacional (.mapa-popup-*, em
+   css/mapa.css, nunca reaproveitada aqui). */
+.regtm-popup strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13.5px;
+}
+
+.regtm-popup-linha {
+  font-size: 12.5px;
+  color: var(--text-secondary, #566072);
+}
+
+.regtm-popup-rotulo {
+  font-weight: 600;
+  color: var(--text-primary, #1f2430);
+}
+
+/* ================= FASE 3: LABELS SOBRE O MAPA =================
+   divIcon com iconSize:[0,0] — Leaflet não impõe tamanho/posição própria,
+   o CSS centra tudo via transform. pointer-events:none garante que o
+   label nunca "rouba" hover/clique do território por baixo (isso continua
+   só na camada de polígonos, ver js/mapas-regionais.js). */
+.regtm-label-wrap {
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 6px;
+  padding: 2px 6px;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  line-height: 1.15;
+}
+
+.regtm-label-codigo {
+  font-weight: 700;
+  font-size: 11.5px;
+  color: #111827;
+}
+
+.regtm-label-nome {
+  font-weight: 500;
+  font-size: 10.5px;
+  color: #374151;
+}
+
+/* Compacto (zoom intermediário / colisão): só o código, nunca o nome —
+   preserva sempre o identificador operacional (item 3 da Fase 3). */
+.regtm-label-compacto .regtm-label-nome {
+  display: none;
+}
+
+/* Oculto (zoom muito baixo / colisão sem espaço): some o label inteiro,
+   mas o território e o clique continuam funcionando normalmente. */
+.regtm-label-oculto {
+  display: none;
+}
+
+/* Label TEMPORÁRIO de hover (ajuste pós-Fase 3 — polos em
+   REGTM_POLOS_LABEL_SOB_DEMANDA, hoje só Aracaju): reaproveita o mesmo
+   visual de .regtm-label-wrap, só com uma sombra um pouco mais forte para
+   se ler como algo passageiro (tipo tooltip), não um rótulo fixo do mapa. */
+.regtm-label-temporario {
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+  z-index: 650;
+}
+
+/* ================= FASE 3: LEGENDA LATERAL ================= */
+
+.regtm-legenda-grupo-titulo {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary, #566072);
+  margin: 14px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border, rgba(15, 23, 42, .09));
+}
+
+.regtm-legenda-grupo-titulo:first-of-type {
+  margin-top: 0;
+}
+
+.regtm-legenda-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.regtm-legenda-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.regtm-legenda-item:hover,
+.regtm-legenda-item-hover {
+  background: var(--surface-alt, #f7f9fb);
+}
+
+.regtm-legenda-item-selecionado {
+  background: rgba(37, 99, 235, 0.1);
+  font-weight: 600;
+}
+
+.regtm-legenda-swatch {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1.5px solid;
+}
+
+.regtm-legenda-texto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ================= FALLBACK MUNICIPAL (finalização) =================
+   Aviso visual (item 13) em TRÊS camadas independentes, nunca só uma:
+   (1) o próprio polígono no mapa (borda tracejada + cor neutra fixa, ver
+   REGTM_ESTILO_FALLBACK em js/mapas-regionais.js — nunca a paleta
+   categórica por território), (2) o selo de texto sobre o label e dentro
+   do popup ("nível municipal"), (3) aqui na legenda: swatch tracejado +
+   selo + título de seção dedicado. Nenhuma das três depende só de cor
+   (acessibilidade / impressão P&B). */
+.regtm-legenda-fallback-titulo {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary, #566072);
+  margin: 14px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--border-strong, rgba(15, 23, 42, .2));
+}
+
+.regtm-legenda-item-fallback {
+  opacity: 0.92;
+}
+
+.regtm-legenda-swatch-fallback {
+  background: repeating-linear-gradient(
+    45deg,
+    #e7e5e4,
+    #e7e5e4 3px,
+    #d6d3d1 3px,
+    #d6d3d1 6px
+  );
+  border-color: #78716c;
+  border-style: dashed;
+}
+
+.regtm-legenda-badge-fallback {
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #57534e;
+  background: #f5f5f4;
+  border: 1px solid #d6d3d1;
+  border-radius: 999px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+/* Label permanente do polígono de fallback (map — ver
+   regtmMontarHtmlLabelFallback): mesmo .regtm-label-wrap de base, só com o
+   selo "nível municipal" destacado no lugar do código operacional. */
+.regtm-label-fallback-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #78716c;
+}
+
+/* Popup do polígono de fallback — aviso em texto, sempre visível antes de
+   qualquer outro dado (nunca deixa a impressão de precisão de bairro). */
+.regtm-popup-aviso-fallback {
+  font-size: 11px;
+  font-weight: 600;
+  color: #78716c;
+  background: #f5f5f4;
+  border: 1px dashed #d6d3d1;
+  border-radius: 6px;
+  padding: 4px 7px;
+  margin-bottom: 6px;
+}
+
+.regtm-popup-lista-fallback {
+  margin: 2px 0 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: var(--text-secondary, #566072);
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.regtm-legenda-sem-geo-titulo {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--warning, #b45309);
+  margin: 14px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border, rgba(15, 23, 42, .09));
+}
+
+.regtm-legenda-item-sem-geo {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 6px;
+  font-size: 12.5px;
+}
+
+.regtm-legenda-sem-geo-texto {
+  font-size: 11.5px;
+  color: var(--text-secondary, #566072);
+  font-style: italic;
+}

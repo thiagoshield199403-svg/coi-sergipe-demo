@@ -1,0 +1,33 @@
+# Segredos e artefatos locais — este é um repositório público (frontend/demo,
+# sem backend); nada aqui deveria existir de fato neste projeto, mas a regra
+# fica como proteção caso alguém rode ferramentas locais nesta pasta.
+# Exceção explícita: .env.example é só placeholder, nunca credencial real.
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# Configuração LOCAL do Claude Code (permissões específicas da máquina de
+# quem desenvolve) — nunca deve ser publicada.
+.claude/settings.local.json
+
+# Dependências (caso algum dia um bundler/ferramenta Node seja adicionado)
+node_modules/
+
+# Caches Python (caso algum script local seja usado nesta pasta)
+__pycache__/
+
+# Bancos de dados locais / dumps
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.sql
+*.bak
+*.backup
+
+# Chaves, certificados e credenciais
+*.pem
+*.key
+credentials*
+secrets*

@@ -1,0 +1,256 @@
+/* ===== MAPA OPERACIONAL =====
+   Segunda visão da Gestão de Equipes (mesmos dados de equipe_operacoes).
+   Carregado depois de styles.css/equipes.css — mesmos custom properties,
+   com fallback (ver css/equipes.css). Leaflet vem por CDN (index.html); as
+   regras abaixo só cuidam do layout ao redor do mapa, nunca de estilo
+   interno do Leaflet além do necessário para os marcadores custom. */
+
+.mapa-layout{
+  display:flex;
+  gap:16px;
+  /* stretch (não mais flex-start): o painel lateral acompanha a altura do
+     mapa (que manda, via height explícito abaixo) e rola internamente
+     (overflow-y no .mapa-sem-geo-wrap) em vez de definir a altura da
+     linha — evita um painel "curto" esticar tudo pro tamanho dele. */
+  align-items:stretch;
+  flex-wrap:wrap;
+}
+
+.mapa-container-wrap{
+  /* Mapa ≈ 78–82% da largura (era ~67%, flex:2 contra flex:1 do painel) —
+     agora basis percentual explícito, o mapa é o elemento principal.
+     A altura TOTAL (mapa + legenda) é fixada aqui — ver comentário do
+     height abaixo — e o mapa ocupa o espaço restante dentro dela
+     (display:flex column + .mapa-leaflet com flex:1), então a legenda
+     sempre tem seu espaço reservado, nunca é empurrada pra trás do
+     rodapé fixo (bug corrigido nesta etapa: a altura ia só pro mapa, sem
+     contar a legenda depois dele). */
+  flex:1 1 78%;
+  min-width:320px;
+  display:flex;
+  flex-direction:column;
+  /* viewport - cabeçalho/filtros (~245px) - rodapé fixo (~72px) - margem
+     de segurança — mesmo valor usado em .mapa-sem-geo-wrap, pra as duas
+     colunas baterem exatamente na mesma altura. */
+  height: calc(100vh - 300px);
+  min-height:520px;
+}
+
+.mapa-leaflet{
+  width:100%;
+  /* Preenche o espaço que sobrar no wrap depois da legenda (min-height:0
+     é necessário pra um item flex conseguir ENCOLHER abaixo do tamanho do
+     seu conteúdo dentro de um container column — sem isso o Leaflet força
+     a altura mínima dele e estoura o wrap). */
+  flex:1 1 auto;
+  min-height:0;
+  border-radius: var(--radius-md, 10px);
+  border:1px solid var(--border-strong, rgba(15,23,42,.14));
+  background: var(--surface-alt, #f7f9fb);
+}
+
+.mapa-indisponivel{
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(220,38,38,.08);
+  border:1px solid rgba(220,38,38,.25);
+  color: var(--danger, #dc2626);
+  font-size:13px;
+  font-weight:600;
+}
+.mapa-indisponivel[hidden]{ display:none; }
+
+.mapa-legenda{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--surface-alt, #f7f9fb);
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  font-size:12.5px;
+  font-weight:600;
+  color: var(--text-secondary, #566072);
+}
+.mapa-legenda-bolinha{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-right:5px;
+  vertical-align:middle;
+}
+
+.mapa-sem-geo-wrap{
+  /* Painel ≈ 18–22% da largura, compacto (era flex:1 contra flex:2 do
+     mapa, ~33%) — max-width trava o crescimento em telas muito largas
+     (nunca "cresce indefinidamente e empurra o mapa"), min-width mantém
+     legibilidade em telas estreitas antes do wrap responsivo assumir. */
+  flex:0 1 20%;
+  min-width:230px;
+  max-width:320px;
+  border:1px solid var(--border, rgba(15,23,42,.09));
+  border-radius: var(--radius-md, 10px);
+  padding:14px 16px;
+  background: var(--surface, #fff);
+  /* Mesma altura TOTAL de .mapa-container-wrap (mapa+legenda) — rola por
+     dentro (overflow-y) quando a lista de equipes sem geo for grande, sem
+     nunca esticar a linha inteira nem empurrar o mapa pra baixo. */
+  height: calc(100vh - 300px);
+  min-height:520px;
+  overflow-y:auto;
+}
+.mapa-sem-geo-wrap h3{ margin:0 0 6px; font-size:14px; }
+.mapa-sem-geo-info{
+  font-size:12px;
+  color: var(--text-muted, #8993a4);
+  margin:0 0 12px;
+}
+
+/* ---- Resumo das equipes filtradas — mesmo card/coluna de
+   .mapa-sem-geo-wrap (nunca uma segunda coluna/altura própria), só duas
+   seções empilhadas dentro dele, separadas por .mapa-resumo-divisor. ---- */
+.mapa-resumo-contagem{
+  font-size:12px;
+  font-weight:700;
+  color: var(--text-secondary, #566072);
+  margin:0 0 10px;
+}
+.mapa-resumo-item{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  padding:6px 6px;
+  margin:0 -6px;
+  border-radius: var(--radius-sm, 6px);
+  border-left:3px solid transparent; /* reservado — só ganha cor quando .mapa-resumo-item-selecionado, nunca desloca o conteúdo */
+  font-size:13px;
+  border-bottom:1px solid var(--border, rgba(15,23,42,.06));
+  cursor:pointer;
+}
+.mapa-resumo-item:last-child{ border-bottom:none; }
+/* Mesmos tokens de destaque já usados em .equipes-horario-btn:hover /
+   .equipes-horario-btn.equipes-horario-ativo (css/equipes.css) — nunca uma
+   cor nova, só reaplicada aqui num item de lista em vez de um botão. */
+.mapa-resumo-item:hover{ background: var(--accent-soft, rgba(11,83,148,.10)); }
+.mapa-resumo-item:focus-visible{
+  outline:2px solid var(--accent-ring, rgba(11,83,148,.22));
+  outline-offset:1px;
+}
+.mapa-resumo-item.mapa-resumo-item-selecionado{
+  background: var(--accent-soft, rgba(11,83,148,.10));
+  border-left-color: var(--accent, #0b5394);
+}
+.mapa-resumo-item .mapa-legenda-bolinha{ margin-top:4px; flex-shrink:0; }
+.mapa-resumo-item-texto{ display:flex; flex-direction:column; line-height:1.35; min-width:0; }
+.mapa-resumo-item-id{ font-weight:700; }
+.mapa-resumo-item-status{ font-size:11.5px; color: var(--text-muted, #8993a4); }
+.mapa-resumo-item-telefone{ font-size:11.5px; color: var(--text-secondary, #566072); }
+.mapa-resumo-item-localidades{
+  font-size:11.5px;
+  color: var(--text-secondary, #566072);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.mapa-resumo-item-localidades-vazio{ color: var(--text-muted, #8993a4); font-style:italic; }
+.mapa-resumo-item-aviso-geo{
+  font-size:11.5px;
+  color: var(--warning, #b45309);
+  font-weight:600;
+}
+.mapa-resumo-item-aviso-geo[hidden]{ display:none; }
+.mapa-resumo-vazio{
+  font-size:13px;
+  color: var(--text-muted, #8993a4);
+  font-style:italic;
+}
+.mapa-resumo-divisor{
+  height:1px;
+  background: var(--border, rgba(15,23,42,.09));
+  margin:14px 0;
+}
+
+.mapa-sem-geo-grupo{ margin-bottom:14px; }
+.mapa-sem-geo-grupo-titulo{
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color: var(--text-secondary, #566072);
+  margin-bottom:6px;
+}
+.mapa-sem-geo-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 0;
+  font-size:13px;
+  border-bottom:1px solid var(--border, rgba(15,23,42,.06));
+}
+.mapa-sem-geo-item:last-child{ border-bottom:none; }
+.mapa-sem-geo-vazio{
+  font-size:13px;
+  color: var(--text-muted, #8993a4);
+  font-style:italic;
+}
+
+/* ---- Marcador custom (DivIcon) — cor por status, ver mapaCorStatus() ---- */
+
+.mapa-marcador{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  border:2px solid #fff;
+  box-shadow:0 1px 4px rgba(15,23,42,.4);
+}
+.mapa-marcador-encerrado{
+  outline:2px solid rgba(220,38,38,.5);
+  outline-offset:1px;
+}
+
+/* ---- Popup do marcador ---- */
+
+.mapa-popup{ font-size:13px; min-width:200px; }
+.mapa-popup-titulo{
+  font-weight:800;
+  font-size:14.5px;
+  margin-bottom:2px;
+}
+.mapa-popup-titulo.equipes-identificador-encerrado{ color: var(--danger, #dc2626); }
+.mapa-popup-status{ font-weight:700; margin-bottom:8px; }
+.mapa-popup-aviso-encerrado{
+  color: var(--danger, #dc2626);
+  font-weight:700;
+  font-size:11.5px;
+  margin-bottom:8px;
+}
+.mapa-popup-linha{ margin-bottom:4px; }
+.mapa-popup-linha b{ color: var(--text-secondary, #566072); }
+/* Fallback território (etapa Barra dos Coqueiros): marcador reaproveitando
+   a geometria do MUNICÍPIO por falta de contorno próprio do bairro — nunca
+   deve parecer a posição exata do bairro, então fica com destaque visual
+   diferente das linhas normais do popup. */
+.mapa-popup-aviso-precisao{
+  color: var(--warning, #b45309);
+  font-weight:600;
+  font-size:12px;
+}
+.mapa-popup-areas{ margin:2px 0 4px 16px; padding:0; }
+.mapa-popup-areas li{ font-size:12.5px; }
+
+/* Responsivo: mapa 100% em cima, resumo empilhado embaixo (mesma
+   arquitetura de sempre — .mapa-layout já quebra linha via flex-wrap,
+   aqui só se ajustam basis/altura pra não ficar espremido). */
+@media (max-width: 860px){
+  .mapa-container-wrap{ flex-basis:100%; height:auto; }
+  .mapa-leaflet{ height:380px; min-height:380px; flex:none; }
+  .mapa-sem-geo-wrap{
+    flex-basis:100%;
+    max-width:none;
+    height:auto;
+    max-height:320px;
+  }
+}

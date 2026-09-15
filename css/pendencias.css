@@ -1,0 +1,318 @@
+/* PENDÊNCIAS (Fase 3, etapa 4) — módulo novo e independente (não reaproveita
+   classes de css/equipes.css nem de css/mapa.css), mesmo padrão de
+   css/mapas-regionais.css. Usa os tokens de styles.css (--accent, --success,
+   --warning, --danger, --surface, --border, --radius-*, --shadow-*,
+   --transition-*) com fallback, mesmo padrão de css/callback-whatsapp.css,
+   já que este arquivo é carregado depois de styles.css. */
+
+.pendencias-wrap{
+    max-width:1400px;
+    margin:0 auto;
+    background: var(--surface, #fff);
+    border-radius: var(--radius-lg, 16px);
+    padding:28px;
+    border:1px solid var(--border, rgba(15,23,42,.09));
+    box-shadow: var(--shadow-md, 0 8px 24px -8px rgba(15,23,42,.16));
+    border-top:3px solid #ff7a00; /* laranja de destaque — mesma cor de acento de .container (styles.css) */
+}
+
+.pendencias-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+}
+.pendencias-header h2{
+    margin:0;
+    text-align:left;
+}
+
+.pendencias-btn-nova{
+    width:auto;
+    white-space:nowrap;
+}
+
+/* ===== SUBNAV (Todas / Comerciais / Técnicas) ===== */
+.pendencias-subnav{
+    display:flex;
+    gap:6px;
+    margin-bottom:16px;
+    border-bottom:1px solid var(--border, #e5e7eb);
+    padding-bottom:0;
+}
+.pendencias-subnav-btn{
+    width:auto;
+    background:transparent;
+    color:var(--text-secondary, #566072);
+    border:none;
+    border-bottom:2px solid transparent;
+    border-radius:0;
+    margin-top:0;
+    padding:10px 14px;
+    font-weight:600;
+}
+.pendencias-subnav-btn:hover{
+    color:var(--text, #1a2130);
+    background:var(--surface-alt, #f7f9fb);
+}
+.pendencias-subnav-btn.ativo{
+    color:var(--accent, #0b5394);
+    border-bottom-color:var(--accent, #0b5394);
+}
+
+/* ===== FILTROS ===== */
+.pendencias-filtros{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:10px;
+    margin-bottom:16px;
+}
+.pendencias-filtros select,
+.pendencias-filtros input{
+    margin-top:0;
+}
+@media(max-width:1200px){
+    .pendencias-filtros{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:760px){
+    .pendencias-filtros{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ===== RESUMO ===== */
+.pendencias-resumo{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:18px;
+}
+.pendencias-resumo-item{
+    background:var(--surface, #fff);
+    border:1px solid var(--border, #e5e7eb);
+    border-radius:var(--radius-md, 10px);
+    padding:12px 14px;
+    text-align:center;
+    box-shadow:var(--shadow-sm, 0 1px 2px rgba(15,23,42,.06));
+}
+.pendencias-resumo-item span{
+    display:block;
+    font-size:24px;
+    font-weight:700;
+    color:var(--text, #1a2130);
+}
+.pendencias-resumo-item label{
+    margin:2px 0 0;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+    color:var(--text-muted, #8993a4);
+}
+.pendencias-resumo-vencida span{color:var(--danger, #dc2626);}
+.pendencias-resumo-hoje span{color:var(--warning, #d97706);}
+
+@media(max-width:760px){
+    .pendencias-resumo{grid-template-columns:repeat(2,1fr);}
+}
+
+.pendencias-erro{
+    background:rgba(220,38,38,.08);
+    border:1px solid var(--danger, #dc2626);
+    color:var(--danger, #dc2626);
+    border-radius:var(--radius-md, 10px);
+    padding:10px 14px;
+    margin-bottom:14px;
+    font-size:13.5px;
+}
+
+.pendencias-vazio{
+    text-align:center;
+    color:var(--text-muted, #8993a4);
+    padding:40px 0;
+    font-size:14px;
+}
+
+/* ===== LISTA / CARDS ===== */
+.pendencias-lista{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));
+    gap:14px;
+}
+
+.pendencias-card{
+    background:var(--surface, #fff);
+    border:1px solid var(--border, #e5e7eb);
+    border-left:4px solid var(--accent, #0b5394);
+    border-radius:var(--radius-md, 10px);
+    padding:14px 16px;
+    box-shadow:var(--shadow-sm, 0 1px 2px rgba(15,23,42,.06));
+    transition:box-shadow var(--transition-fast, 120ms ease);
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+.pendencias-card:hover{
+    box-shadow:var(--shadow-md, 0 8px 24px -8px rgba(15,23,42,.16));
+}
+.pendencias-card-executada{border-left-color:var(--success, #16a34a);}
+.pendencias-card-cancelada{border-left-color:var(--text-muted, #8993a4); opacity:.75;}
+
+.pendencias-card-topo{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:4px;
+}
+.pendencias-card-codigo{
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--text, #1a2130);
+}
+
+.pendencias-badge{
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+    padding:3px 9px;
+    border-radius:999px;
+}
+.pendencias-badge-pendente{background:rgba(11,83,148,.10); color:var(--accent, #0b5394);}
+.pendencias-badge-executada{background:rgba(22,163,74,.12); color:var(--success, #16a34a);}
+.pendencias-badge-cancelada{background:rgba(137,147,164,.15); color:var(--text-muted, #8993a4);}
+
+.pendencias-card-linha{
+    font-size:13px;
+    color:var(--text-secondary, #566072);
+}
+.pendencias-card-linha strong{color:var(--text, #1a2130);}
+.pendencias-card-descricao{
+    color:var(--text, #1a2130);
+    margin:2px 0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+}
+
+.pendencias-vencimento{
+    font-size:12.5px;
+    font-weight:600;
+    margin-top:2px;
+}
+.pendencias-vencimento-normal{color:var(--text-secondary, #566072);}
+.pendencias-vencimento-vence_hoje{color:var(--warning, #d97706);}
+.pendencias-vencimento-vencida{color:var(--danger, #dc2626);}
+
+.pendencias-btn-detalhes{
+    width:auto;
+    align-self:flex-start;
+    margin-top:8px;
+    padding:6px 14px;
+    font-size:12.5px;
+}
+
+/* ===== MODAL: NOVA PENDÊNCIA ===== */
+.pendencias-modal-form{
+    max-width:720px;
+}
+
+/* Ver comentário em pendenciasSelecionarTipoForm() (js/pendencias.js): não
+   dá pra confiar só no atributo `hidden` aqui — `.linha-2{display:grid}`
+   (styles.css) tem a mesma especificidade do `[hidden]{display:none}` do
+   user-agent, e estilo de autor sempre vence esse empate. */
+.pendencias-oculto{
+    display:none !important;
+}
+
+.pendencias-tipo-toggle{
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+}
+.pendencias-tipo-btn{
+    width:auto;
+    flex:1;
+    background:var(--surface-alt, #f7f9fb);
+    color:var(--text-secondary, #566072);
+    border:1px solid var(--border-strong, #d7dce4);
+    margin-top:0;
+}
+.pendencias-tipo-btn.ativo{
+    background:var(--accent, #0b5394);
+    color:#fff;
+    border-color:var(--accent, #0b5394);
+}
+
+.pendencias-hint{
+    display:block;
+    font-size:11.5px;
+    color:var(--text-muted, #8993a4);
+    margin-top:4px;
+}
+
+.pendencias-checkbox-linha{
+    display:flex;
+    align-items:center;
+    margin-top:24px;
+}
+.pendencias-checkbox-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:600;
+    color:var(--text, #1a2130);
+    font-size:13.5px;
+    margin:0;
+}
+.pendencias-checkbox-label input{
+    width:auto;
+    margin:0;
+}
+
+/* ===== MODAL: DETALHE ===== */
+.pendencias-detalhe-corpo{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 20px;
+    margin:14px 0;
+}
+.pendencias-detalhe-linha{
+    font-size:13.5px;
+    color:var(--text-secondary, #566072);
+    padding:4px 0;
+    border-bottom:1px solid var(--border, #e5e7eb);
+}
+.pendencias-detalhe-linha strong{
+    color:var(--text, #1a2130);
+    margin-right:6px;
+}
+@media(max-width:640px){
+    .pendencias-detalhe-corpo{grid-template-columns:1fr;}
+}
+
+.pendencias-detalhe-editar{
+    border-top:1px solid var(--border, #e5e7eb);
+    margin-top:14px;
+    padding-top:14px;
+}
+.pendencias-detalhe-editar h3{
+    margin:0 0 10px;
+    font-size:15px;
+}
+
+.pendencias-btn-perigo{
+    background:var(--danger, #dc2626);
+}
+
+/* ===== MODAL: CONFIRMAR AÇÃO ===== */
+.pendencias-modal-confirmar{
+    max-width:440px;
+    text-align:center;
+}
+.pendencias-modal-confirmar p{
+    font-size:14.5px;
+    color:var(--text, #1a2130);
+    margin:6px 0 16px;
+}

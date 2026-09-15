@@ -1,0 +1,83 @@
+/* ================= CAMPO / OPERAÇÃO (blv-*, e futuros: sg-/ds-/ss-/tf-/sp-) =================
+   Casa de todo CSS específico dos "geradores de script" reintegrados do
+   backup scriptdebloqueioslinhaviva-v2 (Bloqueio LV, Substituição de
+   Trafo, Substituição de Poste, Mais Sinergia, Desarme, Preenchimento de
+   SS — ver auditoria). A maior parte do layout desses formulários usa
+   classes utilitárias JÁ existentes em styles.css (.linha-2/3/4-rel/
+   5-rel/6, button, button.sec, select:invalid) — este arquivo só reúne
+   as poucas regras realmente específicas de cada ferramenta, uma seção
+   por módulo, na mesma ordem em que forem reintegrados.
+
+   Não reaproveita nem sobrescreve nenhuma classe de css/equipes.css,
+   css/mapa.css ou css/mapas-regionais.css. */
+
+/* ===== BLOQUEIO – LINHA VIVA (primeiro módulo reintegrado) =====
+   Mesma regra cosmética do original (backup: "#bloq_equipe {
+   text-transform: uppercase; }") — só o nome do id mudou para o
+   prefixo novo (blv_equipe). Puramente visual: o texto gerado já sai
+   em maiúsculas via .toUpperCase() em js/scripts-campo/bloqueios.js,
+   independente desta regra. */
+#blv_equipe {
+  text-transform: uppercase;
+}
+
+/* ===== SCRIPT MAIS SINERGIA (segundo módulo reintegrado) =====
+   O original (backup) não tinha nenhuma regra de CSS específica pra
+   #sinergia/sg_* — todo o layout já é coberto pelas classes utilitárias
+   existentes em styles.css (.linha-3, button, button.sec). Seção mantida
+   vazia de propósito, só como marcador de onde entrariam regras
+   específicas se precisassem no futuro. */
+
+/* ===== SCRIPT DESARME (terceiro módulo reintegrado) =====
+   Mesmo caso da Sinergia: o original não tinha nenhuma regra de CSS
+   específica pra #desarme/ds_* — layout inteiro coberto pelas classes
+   utilitárias existentes em styles.css. */
+
+/* ===== PREENCHIMENTO DE SS (quarto módulo reintegrado) =====
+   Mesmo caso: o original não tinha nenhuma regra de CSS específica pra
+   #preenchimento_ss/ss_* (era #ss no backup) — layout inteiro coberto
+   pelas classes utilitárias existentes em styles.css. */
+
+/* ===== SUBSTITUIÇÃO DE POSTE (quinto módulo reintegrado) =====
+   Regra "MODO COMPACTO" copiada verbatim do original (backup:
+   "#substituicao_poste label/input/select/textarea/.linha-*/h2" em
+   styles.css) — só o seletor de raiz já era o mesmo id (#substituicao_poste
+   não foi renomeado, ao contrário de bloqueios_lv/preenchimento_ss,
+   porque já era descritivo o suficiente). Necessária de verdade aqui:
+   o formulário tem 35 campos em 9 linhas — sem o modo compacto (rótulos/
+   inputs/selects menores, gaps menores) o formulário ficaria
+   desproporcionalmente alto comparado aos outros módulos. */
+#substituicao_poste label {
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+#substituicao_poste input,
+#substituicao_poste select {
+  height: 30px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+#substituicao_poste textarea {
+  height: 70px;
+  font-size: 12px;
+  padding: 6px;
+}
+
+#substituicao_poste .linha-5-rel,
+#substituicao_poste .linha-4-rel,
+#substituicao_poste .linha-3 {
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+#substituicao_poste h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+/* ===== SUBSTITUIÇÃO DE TRANSFORMADOR (sexto e último módulo reintegrado) =====
+   O original não tinha nenhuma regra de CSS específica pra #trafo/tf_*
+   — layout inteiro (30 campos em .linha-6/.linha-4-rel/.linha-2/.linha-3)
+   coberto pelas classes utilitárias já existentes em styles.css. */
