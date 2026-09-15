@@ -176,7 +176,7 @@ function spMontarTexto(dados, formato) {
   if (formato === "ss") {
     let texto = "#SUBSTITUIÇÃO DE POSTE\n\n";
     texto += `- Operador: ${operador}\n`;
-    texto += `- Ocorrência: ${ocorrencia}\n`;
+    texto += `- N° Incidente: ${ocorrencia}\n`;
     texto += `- ID: ${idPoste}\n`;
     texto += `- Tipo: ${tipo}\n`;
     texto += `- Causa: ${causa}\n`;
@@ -225,7 +225,7 @@ function spMontarTexto(dados, formato) {
   // formato "whats" (default — única outra opção do original)
   let texto = `🛠️ *SUBSTITUIÇÃO DE POSTE*\n\n`;
   texto += `👤 Operador: ${operador}\n`;
-  texto += `📄 Ocorrência: ${ocorrencia}\n`;
+  texto += `📄 N° Incidente: ${ocorrencia}\n`;
   texto += `🏷️ ID Poste: ${idPoste}\n`;
   texto += `⚡ Tipo: ${tipo}\n`;
   texto += `Causa: ${causa}\n\n`;

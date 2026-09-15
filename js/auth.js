@@ -1,12 +1,14 @@
 /* Tela de login — VERSÃO DEMONSTRATIVA (sem backend).
 
    O projeto original usa um backend real (FastAPI) com JWT, refresh token
-   em cookie HttpOnly, etc. Nesta demo pública não existe backend algum e,
-   de propósito, NÃO EXISTE NENHUMA SENHA FIXA — o código é público, então
-   qualquer senha fixa documentada aqui ficaria visível para qualquer
-   pessoa. A checagem abaixo só confere o LOGIN ("demo", não é segredo, só
-   um identificador) — qualquer senha não vazia é aceita. Não é segurança
-   real, e não deveria ser tratada como tal (ver README.md/SECURITY.md).
+   em cookie HttpOnly, etc. Nesta demo pública não existe backend algum: o
+   login abaixo é só uma checagem local de credencial fixa, verificada
+   inteiramente no navegador. Não é segurança real, e não deveria ser
+   tratada como tal (ver README.md/SECURITY.md) — o código é público, então
+   qualquer credencial aqui é, por definição, visível a quem abrir os
+   arquivos. Por isso a credencial NUNCA é citada em README/SECURITY/
+   comentários/mensagens de erro deste arquivo — só existe aqui embaixo,
+   nas duas constantes.
 
    authChamarApi() continua existindo porque js/equipes.js (Gestão de
    Equipes, funcional nesta demo com dados fictícios) chama fetch() através
@@ -15,10 +17,11 @@
 
 const COI_AUTH_STORAGE_KEY = "coi_auth_sessao_demo";
 
-const DEMO_LOGIN = "demo";
+const DEMO_LOGIN = "coi";
+const DEMO_SENHA = "coi2027";
 const DEMO_USUARIO = {
   nome: "Operador Demonstração",
-  login: "demo",
+  login: "coi",
   perfis: ["ADMINISTRADOR", "SUPERVISOR", "OPERADOR"],
 };
 
@@ -108,8 +111,8 @@ function authConectarEventos() {
       authMostrarErro("login_erro", "Preencha login e senha.");
       return;
     }
-    if (login.toLowerCase() !== DEMO_LOGIN) {
-      authMostrarErro("login_erro", "Login incorreto. Use o login de demonstração: demo (qualquer senha é aceita nesta versão).");
+    if (login.toLowerCase() !== DEMO_LOGIN || senha !== DEMO_SENHA) {
+      authMostrarErro("login_erro", "Login ou senha incorretos.");
       return;
     }
 
@@ -130,7 +133,7 @@ function authConectarEventos() {
   });
 
   document.getElementById("esqueci_btn_enviar").addEventListener("click", () => {
-    authMostrarSucesso("esqueci_sucesso", "Recuperação de senha não está disponível nesta versão demonstrativa. Use o login de demonstração: demo (qualquer senha é aceita).");
+    authMostrarSucesso("esqueci_sucesso", "Recuperação de senha não está disponível nesta versão demonstrativa.");
   });
 
   document.getElementById("redefinir_btn_enviar").addEventListener("click", () => {

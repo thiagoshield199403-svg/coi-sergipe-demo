@@ -45,7 +45,7 @@ function cbwTextoAtual() {
     if (!modelo) return "";
     let texto = cbwPreencherTemplate(modelo.texto, { OPERADOR: operador || "____" });
     const ocorrencia = cbwValor("cbw_ocorrencia");
-    if (ocorrencia) texto += `\n\nOcorrência nº ${ocorrencia}`;
+    if (ocorrencia) texto += `\n\nN° Incidente ${ocorrencia}`;
     return texto;
   }
 

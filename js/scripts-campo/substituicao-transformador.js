@@ -152,7 +152,7 @@ function tfMontarTexto(dados, formato) {
   if (formato === "ss") {
     const linhas = [
       `Operador: ${operador}`,
-      `Ocorrência: ${ocorrencia}`,
+      `N° Incidente: ${ocorrencia}`,
       `N° Transformador: ${trafo}`,
       `ID: ${id}`,
       `Motivo: ${motivo}`,
@@ -192,7 +192,7 @@ function tfMontarTexto(dados, formato) {
   return `⚡ Substituição de Transformador
 
 👨‍💻 *Operador:* ${operador}
-*Ocorrência:* ${ocorrencia}
+*N° Incidente:* ${ocorrencia}
 *Nº Trafo:* ${trafo}
 *ID:* ${id}
 

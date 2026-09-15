@@ -28,8 +28,9 @@ mais confiável.)
 
 ## Login de demonstração
 
-Use o login `demo` na tela de acesso (qualquer senha é aceita — não existe uma senha fixa
-para vazar, de propósito, já que o código deste repositório é público).
+A tela de acesso exige um login e uma senha fixos, verificados inteiramente no navegador
+(`js/auth.js`) — a credencial em si não é divulgada aqui de propósito, já que este é um
+repositório público.
 
 **O projeto possui autenticação demonstrativa local. Não utilize credenciais deste demo em
 ambientes reais.** Não existe cadastro de usuários, recuperação de senha real, nem qualquer

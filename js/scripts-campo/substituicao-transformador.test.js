@@ -70,7 +70,7 @@ teste("formato 'whats': com todos os campos preenchidos, monta o texto exatament
     `⚡ Substituição de Transformador
 
 👨‍💻 *Operador:* João
-*Ocorrência:* 12345
+*N° Incidente:* 12345
 *Nº Trafo:* TR-01
 *ID:* T-999
 
@@ -121,7 +121,7 @@ teste("formato 'ss': mesmos dados, rótulos DIFERENTES do whats, todas as linhas
   assert.equal(
     texto,
     `- Operador: João
-- Ocorrência: 12345
+- N° Incidente: 12345
 - N° Transformador: TR-01
 - ID: T-999
 - Motivo: Sobrecarga

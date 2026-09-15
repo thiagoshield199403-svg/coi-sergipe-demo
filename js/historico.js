@@ -38,7 +38,7 @@ function historicoCriarItem(registro, indice) {
       <span class="cbw-badge ${statusClasse}">${historicoEscapar(registro.status)}</span>
     </div>
     <div class="cbw-hist-linha-meta">
-      <span><strong>Ocorrência:</strong> ${historicoEscapar(registro.ocorrencia || "—")}</span>
+      <span><strong>N° Incidente:</strong> ${historicoEscapar(registro.ocorrencia || "—")}</span>
       <span><strong>Cliente:</strong> ${historicoEscapar(registro.telefone || "—")}</span>
       <span><strong>Operador:</strong> ${historicoEscapar(registro.operador || "—")}</span>
     </div>

@@ -84,7 +84,7 @@ teste("formato 'whats': tipo POSTE MT — mostra só a seção Rede MT, oculta R
     `🛠️ *SUBSTITUIÇÃO DE POSTE*
 
 👤 Operador: João
-📄 Ocorrência: 12345
+📄 N° Incidente: 12345
 🏷️ ID Poste: PST-001
 ⚡ Tipo: POSTE MT
 Causa: Quebrado
@@ -118,7 +118,7 @@ teste("formato 'ss': tipo POSTE MT — mesmos dados, rótulos e ORDEM diferentes
     `#SUBSTITUIÇÃO DE POSTE
 
 - Operador: João
-- Ocorrência: 12345
+- N° Incidente: 12345
 - ID: PST-001
 - Tipo: POSTE MT
 - Causa: Quebrado
