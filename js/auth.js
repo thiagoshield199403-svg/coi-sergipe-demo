@@ -1,10 +1,12 @@
 /* Tela de login — VERSÃO DEMONSTRATIVA (sem backend).
 
    O projeto original usa um backend real (FastAPI) com JWT, refresh token
-   em cookie HttpOnly, etc. Nesta demo pública não existe backend algum: o
-   login abaixo é só uma checagem local de usuário/senha fixos, documentada
-   como CREDENCIAL DE DEMONSTRAÇÃO (ver README-DEMO.md) — não é segurança
-   real, e não deveria ser tratada como tal (o código é público).
+   em cookie HttpOnly, etc. Nesta demo pública não existe backend algum e,
+   de propósito, NÃO EXISTE NENHUMA SENHA FIXA — o código é público, então
+   qualquer senha fixa documentada aqui ficaria visível para qualquer
+   pessoa. A checagem abaixo só confere o LOGIN ("demo", não é segredo, só
+   um identificador) — qualquer senha não vazia é aceita. Não é segurança
+   real, e não deveria ser tratada como tal (ver README.md/SECURITY.md).
 
    authChamarApi() continua existindo porque js/equipes.js (Gestão de
    Equipes, funcional nesta demo com dados fictícios) chama fetch() através
@@ -14,7 +16,6 @@
 const COI_AUTH_STORAGE_KEY = "coi_auth_sessao_demo";
 
 const DEMO_LOGIN = "demo";
-const DEMO_SENHA = "coi2026";
 const DEMO_USUARIO = {
   nome: "Operador Demonstração",
   login: "demo",
@@ -107,8 +108,8 @@ function authConectarEventos() {
       authMostrarErro("login_erro", "Preencha login e senha.");
       return;
     }
-    if (login.toLowerCase() !== DEMO_LOGIN || senha !== DEMO_SENHA) {
-      authMostrarErro("login_erro", "Login ou senha incorretos. Use a credencial de demonstração: demo / coi2026.");
+    if (login.toLowerCase() !== DEMO_LOGIN) {
+      authMostrarErro("login_erro", "Login incorreto. Use o login de demonstração: demo (qualquer senha é aceita nesta versão).");
       return;
     }
 
@@ -129,7 +130,7 @@ function authConectarEventos() {
   });
 
   document.getElementById("esqueci_btn_enviar").addEventListener("click", () => {
-    authMostrarSucesso("esqueci_sucesso", "Recuperação de senha não está disponível nesta versão demonstrativa. Use o login demo / coi2026.");
+    authMostrarSucesso("esqueci_sucesso", "Recuperação de senha não está disponível nesta versão demonstrativa. Use o login de demonstração: demo (qualquer senha é aceita).");
   });
 
   document.getElementById("redefinir_btn_enviar").addEventListener("click", () => {

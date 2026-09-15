@@ -4,7 +4,7 @@
 
 - Não há backend, banco de dados, autenticação de produção ou envio de e-mail — ver `README.md` para o detalhamento completo do que foi removido/substituído por simulação local.
 - Nenhum dado operacional interno real (códigos de despacho, protocolos, escalas, contatos) foi incluído — os dados usados na demo são fictícios.
-- O login desta demo (`demo`/`coi2026`) é só uma tela de exemplo, verificada localmente no navegador — não representa autenticação de produção nem controle de acesso real.
+- O projeto possui autenticação demonstrativa local (login `demo`, sem senha fixa exposta — qualquer senha é aceita) — verificada inteiramente no navegador, sem representar autenticação de produção nem controle de acesso real. Não utilize credenciais deste demo em ambientes reais.
 
 ## O que não deve ser adicionado a este repositório
 

@@ -28,13 +28,11 @@ mais confiável.)
 
 ## Login de demonstração
 
-| Usuário | Senha |
-|---|---|
-| `demo` | `coi2026` |
+Use o login `demo` na tela de acesso (qualquer senha é aceita — não existe uma senha fixa
+para vazar, de propósito, já que o código deste repositório é público).
 
-**Esta não é uma senha de segurança real.** Como o código-fonte é público, ela é visível
-para qualquer pessoa que abrir os arquivos — é só uma credencial de demonstração para
-acessar a tela. Não existe cadastro de usuários, recuperação de senha real, nem qualquer
+**O projeto possui autenticação demonstrativa local. Não utilize credenciais deste demo em
+ambientes reais.** Não existe cadastro de usuários, recuperação de senha real, nem qualquer
 autenticação de produção.
 
 ## Como funciona (sem backend)
