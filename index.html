@@ -301,7 +301,13 @@
     </button>
     <div class="menu-categoria-itens-wrap">
       <div class="menu-categoria-itens">
-        <div class="menu-categoria-vazio">Nenhum item cadastrado ainda.</div>
+        <!-- Passagem de Turno: abre o sistema real (Microsoft Power Apps) em
+             nova aba — ver abrirPassagemTurno() no <script> inline abaixo.
+             Não existe módulo local de passagem de turno neste projeto. -->
+        <button onclick="abrirPassagemTurno()">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
+          <span class="menu-label">Passagem de Turno</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2268,6 +2274,15 @@ function abrirTabela() {
 
 function fecharTabela() {
     document.getElementById("modalTabela").style.display = "none";
+}
+
+// Passagem de Turno — sistema real em Microsoft Power Apps, sempre em nova
+// aba. "noopener,noreferrer" equivale a target="_blank" rel="noopener
+// noreferrer" (o item do menu é um <button>, como os demais).
+const URL_PASSAGEM_TURNO = "https://apps.powerapps.com/play/e/default-f8c68086-b95c-49cb-9d38-ed37940abef5/a/d14b0932-5d23-4d98-adb0-45b585098ed4?tenantId=f8c68086-b95c-49cb-9d38-ed37940abef5&hint=c65c7595-59e2-465e-b503-d665536f64b2&sourcetime=1790447194833&source=teamsopenwebsite";
+
+function abrirPassagemTurno() {
+    window.open(URL_PASSAGEM_TURNO, "_blank", "noopener,noreferrer");
 }
 
 </script>

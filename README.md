@@ -67,6 +67,9 @@ ou abrir em uma aba anônima.
   traço tracejado e um selo "nível municipal" (nunca escondido, nunca com posição inventada).
 - **Callback WhatsApp** — gera links `wa.me` e mantém histórico local no navegador.
 - **Tabelas Técnicas** — conteúdo estático inalterado.
+- **Passagem de Turno** (menu GESTÃO) — apenas um link externo: abre o sistema real de
+  passagem de turno (Microsoft Power Apps) em nova aba. Não há módulo local nem
+  "Histórico de Passagens" neste projeto.
 
 ## Módulos pausados nesta demo
 
@@ -105,8 +108,8 @@ versão parcial):
   demo nunca usou. Nada da pasta `backend/` foi movido, copiado ou publicado — foi apagada
   desta cópia.
 - O link real de um formulário interno (Microsoft Forms) usado pela antiga passagem de
-  turno — removido desta cópia pública (o módulo antigo de passagem de turno também foi
-  removido por completo deste projeto).
+  turno — removido desta cópia pública (o módulo local antigo de passagem de turno também
+  foi removido por completo; o item do menu agora abre o Power Apps).
 
 ## Varredura de segurança
 
