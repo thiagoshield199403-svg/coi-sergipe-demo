@@ -12,7 +12,7 @@
    backend/app/schemas/equipes.py no projeto original) para que o
    módulo funcione de verdade nesta demo, com dados de mentira.
 
-   Qualquer outra rota /api/* (auth, pendencias,
+   Qualquer outra rota /api/* (auth,
    admin) — que nesta demo não deveria ser chamada, pois os módulos
    correspondentes foram pausados (ver js/demo-em-desenvolvimento.js)
    — recebe aqui uma resposta seguros (nunca erro de rede), só como

@@ -15,10 +15,6 @@
 <!-- MAPAS DAS REGIONAIS: módulo novo e independente (não reaproveita
      classes de css/mapa.css) — ver css/mapas-regionais.css. -->
 <link rel="stylesheet" href="css/mapas-regionais.css">
-<!-- PENDÊNCIAS (Fase 3, etapa 4): módulo novo e independente, compartilhado
-     por polo — não reaproveita classes de css/equipes.css nem css/mapa.css.
-     Ver css/pendencias.css / js/pendencias.js. -->
-<link rel="stylesheet" href="css/pendencias.css">
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup
      (Bloqueio LV, e futuramente Trafo/Poste/Sinergia/Desarme/SS) — ver
      css/scripts-campo.css. -->
@@ -220,36 +216,6 @@
     </div>
   </div>
 
-  <!-- ===== PENDÊNCIAS =====
-       Fase 3, etapa 4: módulo funcional (etapas 1-3 fizeram só a estrutura
-       de menu, depois o banco/API). COMPARTILHADA por polo (mesma lógica
-       de Gestão de Equipes), ao contrário dos Scripts. Os 3 itens abrem o
-       MESMO módulo (#pendencias), só pré-selecionando a subaba — ver
-       pendenciasAoAbrir() em js/pendencias.js. -->
-  <div class="menu-categoria" data-categoria="pendencias">
-    <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
-      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span class="menu-cat-label">Pendências</span>
-      <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>
-    <div class="menu-categoria-itens-wrap">
-      <div class="menu-categoria-itens">
-        <button onclick="abrirEmDesenvolvimento('Todas as Pendências', this)">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-          <span class="menu-label">Todas as Pendências</span>
-        </button>
-        <button onclick="abrirEmDesenvolvimento('Pendências Comerciais', this)">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-          <span class="menu-label">Pendências Comerciais</span>
-        </button>
-        <button onclick="abrirEmDesenvolvimento('Pendências Técnicas', this)">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          <span class="menu-label">Pendências Técnicas</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== ATENDIMENTO ===== -->
   <div class="menu-categoria" data-categoria="atendimento">
     <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
@@ -307,6 +273,12 @@
         <button onclick="abrirPassagemTurno()">
           <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
           <span class="menu-label">Passagem de Turno</span>
+        </button>
+        <!-- Escala: abre a escala operacional externa (GitHub Pages) em nova
+             aba — ver abrirEscala() no <script> inline abaixo. Sem tela local. -->
+        <button onclick="abrirEscala()">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="8" y1="18" x2="8" y2="18.01"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+          <span class="menu-label">Escala</span>
         </button>
       </div>
     </div>
@@ -381,11 +353,11 @@
   </div>
 
   <!-- ===== EM DESENVOLVIMENTO (VERSÃO DEMONSTRATIVA) =====
-       Placeholder único para todo módulo pausado nesta demo (Pendências,
-       Administração) — ver
+       Placeholder único para todo módulo pausado nesta demo
+       (Administração) — ver
        abrirEmDesenvolvimento() em js/core.js. Abrir estes itens NUNCA chama
-       o código original do módulo (pendenciasAoAbrir,
-       adminCarregarDashboard) nem faz qualquer chamada de rede;
+       o código original do módulo (adminCarregarDashboard) nem faz
+       qualquer chamada de rede;
        os arquivos originais permanecem intactos no projeto para reativação
        futura, só não são executados a partir daqui. -->
   <div id="em_desenvolvimento" class="module">
@@ -1331,172 +1303,6 @@
 </div>
 
 
-<!-- =====///////////////// PENDÊNCIAS (Fase 3, etapa 4) /////////////////// =====
-     COMPARTILHADA por polo (ao contrário dos Scripts, privados por
-     operador) — fonte de verdade é sempre a API (backend/app/routers/
-     pendencias.py); nada aqui usa localStorage para os dados. Ver
-     js/pendencias.js / css/pendencias.css. -->
-<div id="pendencias" class="module">
-  <div class="pendencias-wrap">
-    <div class="pendencias-header">
-      <h2>Pendências</h2>
-      <button type="button" id="pend_btn_nova" class="pendencias-btn-nova">+ Nova Pendência</button>
-    </div>
-
-    <div class="pendencias-subnav">
-      <button type="button" class="pendencias-subnav-btn ativo" data-tipo="TODAS">Todas</button>
-      <button type="button" class="pendencias-subnav-btn" data-tipo="COMERCIAL">Comerciais</button>
-      <button type="button" class="pendencias-subnav-btn" data-tipo="TECNICA">Técnicas</button>
-    </div>
-
-    <div class="pendencias-filtros">
-      <select id="pend_filtro_polo"><option value="">Polo (todos)</option></select>
-      <select id="pend_filtro_status">
-        <option value="">Status (todos)</option>
-        <option value="PENDENTE">Pendente</option>
-        <option value="EXECUTADA">Executada</option>
-        <option value="CANCELADA">Cancelada</option>
-      </select>
-      <select id="pend_filtro_categoria"><option value="">Categoria (todas)</option></select>
-      <select id="pend_filtro_submotivo"><option value="">Submotivo (todos)</option></select>
-      <input id="pend_filtro_responsabilidade" placeholder="Responsabilidade exata...">
-      <input id="pend_filtro_busca" placeholder="Buscar código/OS/INC/SS/descrição...">
-    </div>
-
-    <div class="pendencias-resumo">
-      <div class="pendencias-resumo-item"><span id="pend_resumo_total">0</span><label>Total</label></div>
-      <div class="pendencias-resumo-item"><span id="pend_resumo_pendentes">0</span><label>Pendentes</label></div>
-      <div class="pendencias-resumo-item pendencias-resumo-vencida"><span id="pend_resumo_vencidas">0</span><label>Vencidas</label></div>
-      <div class="pendencias-resumo-item pendencias-resumo-hoje"><span id="pend_resumo_hoje">0</span><label>Vencem hoje</label></div>
-    </div>
-
-    <div id="pend_erro_lista" class="pendencias-erro" style="display:none;"></div>
-    <div id="pend_lista" class="pendencias-lista"></div>
-    <div id="pend_vazio" class="pendencias-vazio" style="display:none;">Nenhuma pendência encontrada.</div>
-  </div>
-</div>
-
-<!-- MODAL: NOVA PENDÊNCIA -->
-<div id="pend_modal_novo" class="modal">
-  <div class="modal-content pendencias-modal-form">
-    <span class="fechar" onclick="pendenciasFecharModalNovo()">&times;</span>
-    <h2>Nova Pendência</h2>
-
-    <div class="pendencias-tipo-toggle">
-      <button type="button" class="pendencias-tipo-btn ativo" data-tipo="TECNICA">Técnica</button>
-      <button type="button" class="pendencias-tipo-btn" data-tipo="COMERCIAL">Comercial</button>
-    </div>
-
-    <div class="linha-2">
-      <div>
-        <label for="pend_form_polo">Polo</label>
-        <select id="pend_form_polo"><option value="">Selecione</option></select>
-      </div>
-      <div>
-        <label for="pend_form_vencimento">Data de vencimento</label>
-        <input type="date" id="pend_form_vencimento">
-      </div>
-    </div>
-
-    <!-- Causa/Subcausa: texto livre (Fase 3/Etapa 5) — categoria/submotivo
-         pré-cadastrados (pendencia_categorias/pendencia_submotivos) ainda
-         não têm carga de dados nem tela de cadastro; a API continua
-         aceitando o modo estruturado (categoria_id/submotivo_id) quando
-         esse catálogo existir no futuro, ver js/pendencias.js. -->
-    <div class="linha-2">
-      <div>
-        <label for="pend_form_causa">Causa / Motivo</label>
-        <input id="pend_form_causa" maxlength="150">
-      </div>
-      <div>
-        <label for="pend_form_subcausa">Subcausa / Submotivo</label>
-        <input id="pend_form_subcausa" maxlength="150">
-      </div>
-    </div>
-
-    <div class="linha-2 pendencias-oculto" id="pend_form_linha_comercial">
-      <div>
-        <label for="pend_form_os">Nº da OS</label>
-        <input id="pend_form_os">
-      </div>
-      <div>
-        <label for="pend_form_ss_comercial">Nº da SS (se houver)</label>
-        <input id="pend_form_ss_comercial">
-      </div>
-    </div>
-
-    <div class="linha-2" id="pend_form_linha_tecnica">
-      <div>
-        <label for="pend_form_inc">Nº do INC (opcional)</label>
-        <input id="pend_form_inc" placeholder="Em branco: backend gera o código PD">
-      </div>
-      <div>
-        <label for="pend_form_ss_tecnica">Nº da SS (se houver)</label>
-        <input id="pend_form_ss_tecnica">
-      </div>
-    </div>
-
-    <label for="pend_form_descricao">Descrição</label>
-    <textarea id="pend_form_descricao"></textarea>
-
-    <div class="linha-2">
-      <div>
-        <label for="pend_form_responsabilidade">Responsabilidade</label>
-        <input id="pend_form_responsabilidade">
-        <span class="pendencias-hint" id="pend_form_responsabilidade_hint"></span>
-      </div>
-      <div class="pendencias-checkbox-linha">
-        <label class="pendencias-checkbox-label">
-          <input type="checkbox" id="pend_form_passagem_turno">
-          Entra na Passagem de Turno
-        </label>
-        <span class="pendencias-hint" id="pend_form_passagem_hint"></span>
-      </div>
-    </div>
-
-    <label for="pend_form_observacao">Observação</label>
-    <textarea id="pend_form_observacao"></textarea>
-
-    <div id="pend_form_erro" class="pendencias-erro" style="display:none;"></div>
-
-    <div class="linha-2">
-      <button type="button" class="sec" onclick="pendenciasFecharModalNovo()">Cancelar</button>
-      <button type="button" id="pend_btn_salvar_novo">Salvar Pendência</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: DETALHE -->
-<div id="pend_modal_detalhe" class="modal">
-  <div class="modal-content">
-    <span class="fechar" onclick="pendenciasFecharModalDetalhe()">&times;</span>
-    <h2 id="pend_detalhe_codigo">PD-...</h2>
-    <div id="pend_detalhe_corpo" class="pendencias-detalhe-corpo"></div>
-    <div class="linha-3">
-      <button type="button" class="sec" onclick="pendenciasFecharModalDetalhe()">Fechar</button>
-      <button type="button" id="pend_btn_editar_detalhe" class="sec">Editar</button>
-      <button type="button" id="pend_btn_executar" onclick="pendenciasConfirmarExecutar()">Executar</button>
-    </div>
-    <div class="linha-2">
-      <button type="button" id="pend_btn_cancelar" class="pendencias-btn-perigo" onclick="pendenciasConfirmarCancelar()">Cancelar Pendência</button>
-    </div>
-    <div id="pend_detalhe_editar" class="pendencias-detalhe-editar"></div>
-  </div>
-</div>
-
-<!-- MODAL: CONFIRMAR AÇÃO (executar/cancelar) -->
-<div id="pend_modal_confirmar" class="modal">
-  <div class="modal-content pendencias-modal-confirmar">
-    <p id="pend_confirmar_texto"></p>
-    <div id="pend_confirmar_erro" class="pendencias-erro" style="display:none;"></div>
-    <div class="linha-2">
-      <button type="button" class="sec" onclick="pendenciasFecharModalConfirmar()">Voltar</button>
-      <button type="button" id="pend_btn_confirmar_acao">Confirmar</button>
-    </div>
-  </div>
-</div>
-
-
 <!-- ///////////////CALLBACK WHATSAPP///////////////////////// -->
 <div id="callback" class="module">
 <div class="container">
@@ -2254,9 +2060,6 @@
      js/mapa.js de propósito — não depende dele, só evita qualquer dúvida
      de ordem (ver js/mapas-regionais.js). -->
 <script src="js/mapas-regionais.js"></script>
-<!-- PENDÊNCIAS (Fase 3, etapa 4): compartilhada por polo, sobre a API de
-     backend/app/routers/pendencias.py (etapa 3) — ver js/pendencias.js. -->
-<script src="js/pendencias.js"></script>
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup, um
      arquivo por ferramenta, cada um isolado (ver auditoria). -->
 <script src="js/scripts-campo/bloqueios.js"></script>
@@ -2283,6 +2086,14 @@ const URL_PASSAGEM_TURNO = "https://apps.powerapps.com/play/e/default-f8c68086-b
 
 function abrirPassagemTurno() {
     window.open(URL_PASSAGEM_TURNO, "_blank", "noopener,noreferrer");
+}
+
+// Escala — escala operacional externa (GitHub Pages), mesmo padrão de
+// abertura em nova aba da Passagem de Turno.
+const URL_ESCALA = "https://adao175.github.io/Escala-operacional-coi-V2/";
+
+function abrirEscala() {
+    window.open(URL_ESCALA, "_blank", "noopener,noreferrer");
 }
 
 </script>

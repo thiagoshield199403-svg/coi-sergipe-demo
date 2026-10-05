@@ -70,19 +70,23 @@ ou abrir em uma aba anônima.
 - **Passagem de Turno** (menu GESTÃO) — apenas um link externo: abre o sistema real de
   passagem de turno (Microsoft Power Apps) em nova aba. Não há módulo local nem
   "Histórico de Passagens" neste projeto.
+- **Escala** (menu GESTÃO) — apenas um link externo: abre a escala operacional
+  (GitHub Pages) em nova aba. Não há tela local.
 
 ## Módulos pausados nesta demo
 
-Aparecem no menu, mas mostram "Em desenvolvimento" ao serem abertos — **não fazem nenhuma
+Aparece no menu, mas mostra "Em desenvolvimento" ao ser aberto — **não faz nenhuma
 chamada de rede**:
 
-- **Pendências** (Todas / Comerciais / Técnicas)
 - **Administração** (gestão de usuários reais)
 
-Esses módulos **dependem de um backend privado** (banco de dados, autenticação de produção,
+Esse módulo **depende de um backend privado** (banco de dados, autenticação de produção,
 envio de e-mail) que não existe nesta cópia e não faz parte deste repositório. O código
-frontend original de cada um continua em `js/`/`css/` para eventual reaproveitamento futuro,
+frontend original continua em `js/`/`css/` para eventual reaproveitamento futuro,
 só não é executado a partir desta versão.
+
+O antigo módulo **Pendências** (Todas / Comerciais / Técnicas) foi removido por completo
+deste projeto (menu, telas, modais, `js/pendencias.js`, `css/pendencias.css` e testes).
 
 ## Dados fictícios
 
@@ -137,7 +141,6 @@ node js/equipes.test.js
 node js/mapa.test.js
 node js/mapas-regionais.test.js
 node js/auth.test.js
-node js/pendencias.test.js
 node js/scripts-campo/bloqueios.test.js
 node js/scripts-campo/desarme.test.js
 node js/scripts-campo/preenchimento-ss.test.js
