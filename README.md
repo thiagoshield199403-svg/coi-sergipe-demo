@@ -1,6 +1,6 @@
 # COI Sergipe — Versão Demonstrativa
 
-Esta é uma cópia pública e demonstrativa (frontend/demo) do sistema interno **COI Sergipe** (Centro de Operação Integrado), usado pela Energisa Sergipe. **Não é o sistema de produção**, não contém o backend real, e algumas funções desta demo dependem de um backend privado que não faz parte deste repositório (ver "Módulos pausados" abaixo).
+Esta é uma cópia pública e demonstrativa (frontend/demo) do sistema interno **COI Sergipe** (Centro de Operação Integrado). **Não é o sistema de produção**, não contém o backend real, e algumas funções desta demo dependem de um backend privado que não faz parte deste repositório (ver "Módulos pausados" abaixo).
 
 Resumo do que esta demo **não** é/não tem:
 
