@@ -18,7 +18,7 @@ function openModule(id,btn){
 }
 
 // VERSÃO DEMONSTRATIVA: abre o placeholder único "#em_desenvolvimento" em
-// vez do módulo real (Pendências/Passagem de Turno/Histórico/Administração)
+// vez do módulo real (Pendências/Administração)
 // — nunca executa o código original do módulo, nunca chama a API.
 function abrirEmDesenvolvimento(nomeModulo, btn) {
  openModule('em_desenvolvimento', btn);

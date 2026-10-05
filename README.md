@@ -74,7 +74,6 @@ Aparecem no menu, mas mostram "Em desenvolvimento" ao serem abertos — **não f
 chamada de rede**:
 
 - **Pendências** (Todas / Comerciais / Técnicas)
-- **Passagem de Turno** e **Histórico de Passagens**
 - **Administração** (gestão de usuários reais)
 
 Esses módulos **dependem de um backend privado** (banco de dados, autenticação de produção,
@@ -105,9 +104,9 @@ versão parcial):
   despacho operacional real, além do backend real (FastAPI/PostgreSQL/JWT/e-mail) que esta
   demo nunca usou. Nada da pasta `backend/` foi movido, copiado ou publicado — foi apagada
   desta cópia.
-- O link real de um formulário interno (Microsoft Forms) usado pela função `abrirTurno()`
-  em `index.html` — substituído por um aviso de que o link não está configurado nesta demo
-  pública (nunca aberto de fato).
+- O link real de um formulário interno (Microsoft Forms) usado pela antiga passagem de
+  turno — removido desta cópia pública (o módulo antigo de passagem de turno também foi
+  removido por completo deste projeto).
 
 ## Varredura de segurança
 
@@ -135,7 +134,6 @@ node js/equipes.test.js
 node js/mapa.test.js
 node js/mapas-regionais.test.js
 node js/auth.test.js
-node js/passagem-turno.test.js
 node js/pendencias.test.js
 node js/scripts-campo/bloqueios.test.js
 node js/scripts-campo/desarme.test.js

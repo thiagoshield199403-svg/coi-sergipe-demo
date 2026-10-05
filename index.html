@@ -19,11 +19,6 @@
      por polo — não reaproveita classes de css/equipes.css nem css/mapa.css.
      Ver css/pendencias.css / js/pendencias.js. -->
 <link rel="stylesheet" href="css/pendencias.css">
-<!-- PASSAGEM DE TURNO (Fase 4, etapa 4): módulo novo e independente,
-     compartilhado por polo (mesma lógica de Pendências) — substitui o
-     Microsoft Forms usado até aqui. Ver css/passagem-turno.css /
-     js/passagem-turno.js. -->
-<link rel="stylesheet" href="css/passagem-turno.css">
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup
      (Bloqueio LV, e futuramente Trafo/Poste/Sinergia/Desarme/SS) — ver
      css/scripts-campo.css. -->
@@ -306,17 +301,7 @@
     </button>
     <div class="menu-categoria-itens-wrap">
       <div class="menu-categoria-itens">
-        <button onclick="abrirEmDesenvolvimento('Passagem de Turno', this)">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="16" y2="16"/></svg>
-          <span class="menu-label">Passagem de Turno</span>
-        </button>
-        <!-- VERSÃO DEMONSTRATIVA: sempre visível (não há mais gate por perfil
-             real), leva ao placeholder "Em desenvolvimento" — ver
-             abrirEmDesenvolvimento() em js/core.js. -->
-        <button id="menu_item_pt_historico" onclick="abrirEmDesenvolvimento('Histórico de Passagens', this)">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-          <span class="menu-label">Histórico de Passagens</span>
-        </button>
+        <div class="menu-categoria-vazio">Nenhum item cadastrado ainda.</div>
       </div>
     </div>
   </div>
@@ -391,10 +376,10 @@
 
   <!-- ===== EM DESENVOLVIMENTO (VERSÃO DEMONSTRATIVA) =====
        Placeholder único para todo módulo pausado nesta demo (Pendências,
-       Passagem de Turno, Histórico de Passagens, Administração) — ver
+       Administração) — ver
        abrirEmDesenvolvimento() em js/core.js. Abrir estes itens NUNCA chama
-       o código original do módulo (pendenciasAoAbrir, passagemTurnoAoAbrir,
-       pthAoAbrir, adminCarregarDashboard) nem faz qualquer chamada de rede;
+       o código original do módulo (pendenciasAoAbrir,
+       adminCarregarDashboard) nem faz qualquer chamada de rede;
        os arquivos originais permanecem intactos no projeto para reativação
        futura, só não são executados a partir daqui. -->
   <div id="em_desenvolvimento" class="module">
@@ -1506,225 +1491,6 @@
 </div>
 
 
-<!-- =====///////////////// PASSAGEM DE TURNO (Fase 4, etapa 4A — painel operacional) /////////////////// =====
-     COMPARTILHADA por polo, sobre a API de backend/app/routers/
-     passagem_turno.py (etapa 3) — substitui o Microsoft Forms usado até
-     aqui. PAINEL DE PÁGINA ÚNICA (não wizard): configuração, pendências e
-     as 9 perguntas operacionais ficam todas na mesma página, com rolagem
-     normal — ver js/passagem-turno.js / css/passagem-turno.css. Nenhum
-     dado de Pendências é duplicado aqui: os cards de pendência reaproveitam
-     os campos que a própria API já devolve (PendenciaOut). -->
-<div id="passagem_turno" class="module">
-  <div class="pt-wrap">
-    <div class="pt-header">
-      <div class="pt-header-titulo">
-        <h2>Passagem de Turno</h2>
-        <p class="pt-header-subtitulo">Planejamento e continuidade operacional</p>
-      </div>
-      <div class="pt-remetente" id="pt_remetente_info"></div>
-    </div>
-
-    <div id="pt_erro_geral" class="pendencias-erro" style="display:none;"></div>
-
-    <!-- CONFIGURAÇÃO DA PASSAGEM (turno + polos + destinatário, tudo compacto) -->
-    <section class="pt-secao" id="pt_secao_config">
-      <h3>Configuração da Passagem</h3>
-
-      <div id="pt_config_edicao">
-        <div class="pt-config-bloco">
-          <label class="pt-config-rotulo">Turno</label>
-          <div class="pt-turno-presets">
-            <button type="button" class="pt-turno-btn" data-turno="06h-14h">06h–14h</button>
-            <button type="button" class="pt-turno-btn" data-turno="14h-22h">14h–22h</button>
-            <button type="button" class="pt-turno-btn" data-turno="22h-06h">22h–06h</button>
-            <button type="button" class="pt-turno-btn" id="pt_turno_btn_outro">Outro</button>
-          </div>
-          <div id="pt_turno_manual">
-            <input id="pt_turno_input" placeholder="Ex: 06h-14h">
-          </div>
-        </div>
-
-        <div class="pt-config-bloco">
-          <label class="pt-config-rotulo">Polo(s) e destinatário de cada polo</label>
-          <div class="pt-bulk-acao" id="pt_bulk_wrap" style="display:none;">
-            <select id="pt_bulk_destinatario"></select>
-            <button type="button" class="sec" id="pt_btn_bulk_aplicar">Aplicar a todos os polos selecionados</button>
-          </div>
-          <div class="pt-config-polos-lista" id="pt_polos_grid"></div>
-        </div>
-
-        <div id="pt_config_erro" class="pendencias-erro" style="display:none;"></div>
-        <div class="pt-config-acoes">
-          <span></span>
-          <button type="button" id="pt_btn_confirmar_config">Confirmar configuração</button>
-        </div>
-      </div>
-
-      <div id="pt_config_resumo" class="pt-config-resumo" hidden>
-        <div id="pt_config_resumo_lista"></div>
-        <button type="button" class="sec" id="pt_btn_nova_passagem_topo">+ Iniciar nova passagem</button>
-      </div>
-    </section>
-
-    <!-- CORPO: só aparece depois de confirmar a configuração acima -->
-    <div id="pt_corpo" hidden>
-      <div class="pt-polo-tabs" id="pt_polo_tabs"></div>
-
-      <!-- PENDÊNCIAS DO POLO -->
-      <section class="pt-secao">
-        <h3>Pendências do Polo <span class="pt-secao-polo-tag" id="pt_pendencias_polo_tag"></span></h3>
-        <p class="pt-secao-legenda">Recuperadas automaticamente do módulo de Pendências. Remover aqui não exclui a pendência original.</p>
-        <div id="pt_pendencias_erro" class="pendencias-erro" style="display:none;"></div>
-        <div class="pt-pendencias-lista" id="pt_pendencias_lista"></div>
-      </section>
-
-      <!-- INFORMAÇÕES OPERACIONAIS -->
-      <section class="pt-secao">
-        <div class="pt-secao-titulo-linha">
-          <div>
-            <h3>Informações Operacionais <span class="pt-secao-polo-tag" id="pt_itens_polo_tag"></span></h3>
-            <p class="pt-secao-legenda">Responda apenas o que existir agora neste polo. Cada pergunta aceita quantos itens forem necessários.</p>
-          </div>
-          <button type="button" class="sec" id="pt_btn_ver_passagem_anterior">Ver passagem anterior deste polo</button>
-        </div>
-        <div id="pt_itens_anterior_lista" class="pt-itens-anterior-lista" hidden></div>
-        <div id="pt_itens_erro" class="pendencias-erro" style="display:none;"></div>
-
-        <div class="pt-perguntas-grid" id="pt_perguntas_grid"></div>
-      </section>
-
-      <!-- REVISÃO + TERMO + ENVIO -->
-      <section class="pt-secao">
-        <h3>Revisão Final</h3>
-        <div class="pt-revisao-resumo-topo" id="pt_revisao_resumo_topo"></div>
-        <div class="pt-revisao-lista" id="pt_revisao_tbody"></div>
-
-        <label class="pt-termo-label">
-          <input type="checkbox" id="pt_termo_checkbox">
-          Declaro que revisei as informações e estou ciente de que sou responsável pelas informações que estou repassando ao próximo turno.
-        </label>
-
-        <div id="pt_envio_erro" class="pendencias-erro" style="display:none;"></div>
-
-        <div class="pt-config-acoes">
-          <span></span>
-          <button type="button" class="pt-btn-enviar" id="pt_btn_enviar" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Confirmar e enviar passagem</button>
-        </div>
-      </section>
-    </div>
-
-    <!-- CONFIRMAÇÃO -->
-    <div class="pt-confirmacao-box" id="pt_confirmacao" hidden>
-      <h3>Passagem de turno enviada com sucesso.</h3>
-      <div id="pt_confirmacao_corpo"></div>
-      <button type="button" id="pt_btn_nova_passagem">Iniciar nova passagem</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- MODAL: item de uma pergunta operacional — genérico, reaproveitado pelas
-     9 perguntas (Etapa 4A: nada de seletor de "tipo de item" na tela
-     principal; o tipo já vem fixado pelo card/botão que abriu o modal). -->
-<div id="pt_modal_item" class="modal">
-  <div class="modal-content pt-modal-item">
-    <span class="fechar" onclick="ptFecharModalItem()">&times;</span>
-    <h2 id="pt_modal_item_titulo">Adicionar item</h2>
-    <p class="pt-modal-item-exemplo" id="pt_modal_item_exemplo"></p>
-
-    <label id="pt_modal_item_label_identificador" for="pt_modal_item_identificador">Identificador</label>
-    <input id="pt_modal_item_identificador">
-
-    <label id="pt_modal_item_label_descricao" for="pt_modal_item_descricao">Descrição</label>
-    <textarea id="pt_modal_item_descricao"></textarea>
-
-    <div id="pt_modal_item_erro" class="pendencias-erro" style="display:none;"></div>
-
-    <div class="linha-2">
-      <button type="button" class="sec" onclick="ptFecharModalItem()">Cancelar</button>
-      <button type="button" id="pt_btn_modal_item_salvar">Adicionar</button>
-    </div>
-  </div>
-</div>
-
-<!-- HISTÓRICO E RELATÓRIO DE PASSAGEM DE TURNO (Fase 6) — só
-     ADMINISTRADOR/SUPERVISOR (o botão de menu correspondente fica oculto
-     pra qualquer outro perfil, ver pthAtualizarMenu() em
-     js/passagem-turno-historico.js; o backend também bloqueia com 403).
-     Somente leitura: reaproveita PassagemTurno + PassagemTurnoPendencia +
-     PassagemTurnoItens + Auditoria já existentes, nenhuma tabela nova. -->
-<div id="passagem_turno_historico" class="module">
-  <div class="pt-wrap">
-    <div class="pt-header">
-      <div class="pt-header-titulo">
-        <h2>Histórico de Passagens de Turno</h2>
-        <p class="pt-header-subtitulo">Consulta e relatório — somente leitura</p>
-      </div>
-    </div>
-
-    <div id="pth_erro_geral" class="pendencias-erro" style="display:none;"></div>
-
-    <section class="pt-secao pth-indicadores" id="pth_indicadores"></section>
-
-    <section class="pt-secao">
-      <h3>Filtros</h3>
-      <div class="pth-filtros-grid">
-        <div class="pth-campo">
-          <label for="pth_filtro_polo">Polo</label>
-          <input id="pth_filtro_polo" placeholder="Todos">
-        </div>
-        <div class="pth-campo">
-          <label for="pth_filtro_turno">Turno</label>
-          <input id="pth_filtro_turno" placeholder="Todos">
-        </div>
-        <div class="pth-campo">
-          <label for="pth_filtro_status">Status</label>
-          <select id="pth_filtro_status">
-            <option value="ENVIADA" selected>Enviada</option>
-            <option value="RASCUNHO">Rascunho</option>
-            <option value="">Todos</option>
-          </select>
-        </div>
-        <div class="pth-campo">
-          <label for="pth_filtro_remetente">Remetente</label>
-          <select id="pth_filtro_remetente"><option value="">Todos</option></select>
-        </div>
-        <div class="pth-campo">
-          <label for="pth_filtro_destinatario">Destinatário</label>
-          <select id="pth_filtro_destinatario"><option value="">Todos</option></select>
-        </div>
-        <div class="pth-campo">
-          <label for="pth_filtro_periodo_de">Período — de</label>
-          <input type="date" id="pth_filtro_periodo_de">
-        </div>
-        <div class="pth-campo">
-          <label for="pth_filtro_periodo_ate">Período — até</label>
-          <input type="date" id="pth_filtro_periodo_ate">
-        </div>
-      </div>
-      <div class="pth-filtros-acoes">
-        <button type="button" class="sec" id="pth_btn_limpar_filtros">Limpar filtros</button>
-        <button type="button" id="pth_btn_buscar">Buscar</button>
-      </div>
-    </section>
-
-    <section class="pt-secao">
-      <div id="pth_lista_vazia" class="pth-vazio" hidden>Nenhuma passagem encontrada para os filtros selecionados.</div>
-      <div class="pth-lista" id="pth_lista"></div>
-      <div class="pth-paginacao" id="pth_paginacao"></div>
-    </section>
-  </div>
-</div>
-
-<!-- MODAL: detalhe de uma passagem no histórico -->
-<div id="pth_modal_detalhe" class="modal">
-  <div class="modal-content admin-modal-content admin-modal-largo">
-    <span class="fechar" onclick="pthFecharDetalhe()">&times;</span>
-    <h2 id="pth_detalhe_titulo">Detalhe da passagem</h2>
-    <div id="pth_detalhe_conteudo"></div>
-  </div>
-</div>
-
 <!-- ///////////////CALLBACK WHATSAPP///////////////////////// -->
 <div id="callback" class="module">
 <div class="container">
@@ -2438,18 +2204,6 @@
 </div>
 
     
-<script>
-// VERSÃO DEMONSTRATIVA: a URL real (Microsoft Forms interno da Energisa,
-// usado pela equipe do COI para o formulário de passagem de turno) foi
-// removida por segurança desta cópia pública — nunca substituída por uma
-// versão parcial/ofuscada, o link real não existe mais neste arquivo.
-// Placeholder documentado abaixo só como exemplo de onde um link real
-// entraria numa instância própria; nunca é de fato aberto por esta demo.
-const COI_DEMO_LINK_PASSAGEM_TURNO_PLACEHOLDER = "https://example.com/microsoft-forms-configurar";
-function abrirTurno(){
-  showToast("Link do formulário não configurado no demo público.");
-}
-</script>
 <div class="footer-global">
   <div class="footer-left">
     <div class="coi-wordmark coi-wordmark--sm" role="img" aria-label="COI Sergipe">
@@ -2497,16 +2251,6 @@ function abrirTurno(){
 <!-- PENDÊNCIAS (Fase 3, etapa 4): compartilhada por polo, sobre a API de
      backend/app/routers/pendencias.py (etapa 3) — ver js/pendencias.js. -->
 <script src="js/pendencias.js"></script>
-<!-- PASSAGEM DE TURNO (Fase 4, etapa 4): compartilhada por polo, sobre a
-     API de backend/app/routers/passagem_turno.py (etapa 3) — ver
-     js/passagem-turno.js. -->
-<script src="js/passagem-turno.js"></script>
-<!-- HISTÓRICO DE PASSAGEM DE TURNO (Fase 6): admin/supervisor, somente
-     leitura, sobre GET /api/passagens-turno/historico* — ver
-     js/passagem-turno-historico.js. Carregado depois de passagem-turno.js
-     de propósito (mesma ordem de dependência conceitual), mas é um
-     arquivo independente, sem função em comum com ele. -->
-<script src="js/passagem-turno-historico.js"></script>
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup, um
      arquivo por ferramenta, cada um isolado (ver auditoria). -->
 <script src="js/scripts-campo/bloqueios.js"></script>
