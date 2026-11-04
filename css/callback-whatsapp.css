@@ -292,96 +292,17 @@
   height:15px;
 }
 
-/* ---------- histórico ---------- */
-.cbw-historico{
-  margin-top:26px;
-  padding-top:18px;
-  border-top:1px solid #eee;
+/* ---------- seletor de mensagens (assuntos) ---------- */
+/* Assuntos em negrito, como na Central Callback Web 1.1.0
+   (optgroup { font-weight: 700 }); as mensagens ficam em peso normal. */
+#cbw_tipo_ocorrencia optgroup{
+  font-weight:700;
+  font-style:normal;
+  color:var(--text, #1a2130);
 }
-.cbw-historico-topo{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.cbw-historico-topo button{
-  width:auto;
-  background:var(--surface-alt, #eceff3);
-  color:var(--text-secondary, #555);
-  font-size:12px;
-  padding:7px 12px;
-  border:1px solid var(--border, transparent);
-  border-radius:var(--radius-sm, 6px);
-}
-#cbw_historico_vazio{
-  color:#999;
-  font-size:13px;
-  text-align:center;
-  padding:18px 0;
-}
-
-.cbw-hist-item{
-  background: var(--surface-alt, #f8fafc);
-  border:1px solid var(--border, #eef1f5);
-  border-radius: var(--radius-md, 10px);
-  padding:12px 14px;
-  margin-top:10px;
-  transition: border-color var(--transition-base, .2s ease);
-}
-.cbw-hist-linha-topo{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:12px;
-  color:#667;
-}
-.cbw-hist-linha-meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:4px 16px;
-  font-size:12.5px;
-  color:#334;
-  margin-top:4px;
-}
-.cbw-hist-linha-meta strong{
-  color:#667;
-  font-weight:600;
-}
-
-.cbw-badge{
-  font-size:11px;
-  font-weight:bold;
-  padding:2px 8px;
-  border-radius:20px;
-}
-.cbw-badge-ok{
-  background:#e3f6e8;
-  color:#1e7e34;
-}
-.cbw-badge-pendente{
-  background:#fff3e0;
-  color:#a5680b;
-}
-
-.cbw-hist-ver{
-  width:auto;
-  background:none;
-  border:none;
-  color:var(--azul-primario, #0b5394);
-  font-size:12px;
-  font-weight:600;
-  padding:6px 0 0;
-  cursor:pointer;
-}
-.cbw-hist-mensagem{
-  white-space:pre-wrap;
-  background:#fff;
-  border:1px solid #e5e9ef;
-  border-radius:8px;
-  padding:10px;
-  font-size:12.5px;
-  font-family:inherit;
-  color:#333;
-  margin-top:6px;
+#cbw_tipo_ocorrencia option{
+  font-weight:400;
+  color:var(--text, #1a2130);
 }
 
 /* ---------- responsivo ---------- */

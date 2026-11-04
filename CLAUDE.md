@@ -22,6 +22,7 @@ There is no test suite or linter. To sanity-check an edit without a browser:
 **Current modules / sidebar entries:**
 - **Início** (`#inicio`) — placeholder welcome screen. No functionality yet; this is where the future home/dashboard will live.
 - **Callback WhatsApp** (`#callback`) — the one fully-functional module. See below.
+- **Central Callback Web** (ATENDIMENTO) — not an internal module; the sidebar button calls `abrirCentralCallback()` (inline in `index.html`), which opens `https://thiagoshield199403-svg.github.io/central-callback/` in a new tab via `window.open(url, "_blank", "noopener,noreferrer")`.
 - **Mapa Regionais** (`#mapas_regionais`) — grid of clickable regional map images, opens `#modal-mapa` via `abrirMapa()`/`fecharMapa()` (`js/utilitarios.js`).
 - **Mapa de Empreiteira** — same modal mechanism, single image (`mapas/mapa_empreiteiras.jpg`), triggered directly from the sidebar button (no dedicated `.module`).
 - **Tabelas Técnicas** — opens `#modalTabela` (a plain `.modal` div, not a `.module`) via `abrirTabela()`/`fecharTabela()`, defined inline in `index.html`.
@@ -33,23 +34,22 @@ There is no test suite or linter. To sanity-check an edit without a browser:
 **All `js/*.js` files load as classic `<script src>` tags (no ES modules, no bundler) and share one global scope.** Current files, each single-purpose:
 - `js/core.js` — `showToast()`, `openModule()`, `atualizarRodape()` (footer clock, self-scheduling via `setInterval`). This is the sole definition of these three functions; do not redefine them elsewhere (index.html used to duplicate them inline — removed in etapa 3.1).
 - `js/utilitarios.js` — `abrirMapa()`/`fecharMapa()` for the map modal (`#modal-mapa`). Sole definition; index.html used to duplicate these inline — removed in etapa 3.1.
-- `js/mensagens.js`, `js/storage.js`, `js/historico.js`, `js/callback-whatsapp.js` — the Callback WhatsApp module, see below.
+- `js/mensagens.js`, `js/callback-whatsapp.js` — the Callback WhatsApp module, see below.
 
-`abrirTabela()`/`fecharTabela()` (Tabelas Técnicas modal) and `abrirEscala()`/`abrirPassagemTurno()` (external links) remain defined inline in `index.html`'s own `<script>` blocks — they have no JS-file counterpart and are not duplicated.
+`abrirTabela()`/`fecharTabela()` (Tabelas Técnicas modal) and `abrirEscala()`/`abrirPassagemTurno()`/`abrirCentralCallback()` (external links) remain defined inline in `index.html`'s own `<script>` blocks — they have no JS-file counterpart and are not duplicated.
 
 Several files rely on the browser's implicit global bindings for elements with an `id` (e.g. `ramal.value` instead of `document.getElementById('ramal').value`) in older patterns — this means **removing or renaming an `id` that's referenced this way breaks the referencing script even if you only touched the HTML**. Before deleting/renaming any `id`, grep the `js/` folder for bare references to that identifier, not just `getElementById` calls.
 
-**WhatsApp callback module** (`#callback`) is split across four files:
-- `js/mensagens.js` — message *content* only: `MENSAGENS_CALLBACK` (20 standardized templates keyed by occurrence type, each `{label, texto}` with `{{OPERADOR}}` placeholder) and `saudacaoPersonalizada()`. Zero logic, safe to edit freely.
-- `js/storage.js` — `CallbackStorage`, a small `localStorage` wrapper (`listarTodos()` / `salvar()` / `limparTudo()`), the one module with an actual persistence abstraction. This is the intended seam for a future backend/database swap — `historico.js` and `callback-whatsapp.js` only ever call these three functions, never touch `localStorage` directly.
-- `js/historico.js` — renders saved history from `CallbackStorage.listarTodos()`, escapes user content via `historicoEscapar()` before `innerHTML`.
-- `js/callback-whatsapp.js` — orchestration: `cbwPreencherTemplate()` does `{{...}}` substitution, `cbwEnviar()` validates required fields, normalizes the phone number (auto-adds `55` DDI for 10/11-digit numbers), builds the `wa.me/<numero>?text=...` link, opens it via `window.open(link, "coiWhatsAppWeb")` (reuses the same named tab across sends), and saves the record via `CallbackStorage.salvar()`.
+**WhatsApp callback module** (`#callback`) is split across two files (manual entry of operator, incident and phone — no CSV import, by design):
+- `js/mensagens.js` — message *content* only: `SAUDACAO_CALLBACK` ("Olá, aqui é a Energisa."), `MENSAGENS_CALLBACK` (the 23 manual-selection messages of the Central Callback Web 1.1.0, copied verbatim from its `js/modelos.js`, each `{grupo, label, prioridade, texto}`, ordered by subject then title, pt-BR) and `saudacaoPersonalizada()`. The 4 automatic Central messages (abertura/previsão/encerramento) are intentionally NOT included. Do not edit texts without updating the Central.
+- `js/callback-whatsapp.js` — orchestration: builds the `<select>` with one bold `<optgroup>` per subject ("⚠ PRIORIDADE" on risk subtypes, like the Central), renders the text (`Referência do atendimento: <incidente>` appended, like the Central), applies the greeting to the personalized mode (`cbwComSaudacao`), normalizes the phone only to add DDI 55 (no mobile-only restriction), and opens WhatsApp Web exactly like the Central: `window.open("about:blank", "_blank")` inside the click, `opener = null`, then navigates to `https://web.whatsapp.com/send?phone=55…&text=…`. Never use `wa.me`/`api.whatsapp.com` (they show an intermediate page and caused a second tab). Opening the chat does not send anything.
+- `js/callback-whatsapp.test.js` — Node tests for the above.
 
-Fields used per callback record: operator name, occurrence number, client phone, mode (padronizada/personalizada), occurrence type, final sent text, status (always `"Enviado"` — reflects only that the WhatsApp link was opened, **not** delivery/read confirmation, since this is the public `wa.me` link, not the official WhatsApp Business API).
+The old message history (`js/storage.js`, `js/historico.js`, its UI and CSS) was removed. On init the module removes only the obsolete key `localStorage["coi_callback_whatsapp_historico"]`.
 
 ## ARMAZENAMENTO ATUAL
 
-Only one persisted key exists in the entire project: `localStorage["coi_callback_whatsapp_historico"]`, an array of callback records (see `js/storage.js`), written/read exclusively through `CallbackStorage`. No `sessionStorage`, no cookies, no other `localStorage` keys, no JSON data files. Data lives only in the browser that created it — it does not sync between operators or machines.
+The Callback WhatsApp module persists nothing. Other modules use their own keys (e.g. `coi_demo_db_v1` for the demo backend, `coi_auth_sessao_demo` for the demo login) — never clear the whole `localStorage`. No backend, no database; data lives only in the browser that created it.
 
 ## AUSÊNCIA DE BACKEND / BANCO
 
@@ -74,9 +74,9 @@ A proposed entity/table design for the above exists only as a written analysis f
 
 ## Design system (CSS)
 
-`styles.css` defines the shared design tokens in `:root` (`--accent`, `--surface`, `--border`, `--radius-*`, `--shadow-*`, `--transition-*`, plus dedicated `--sidebar-*` tokens for the dark sidebar) and all global element/utility rules (`button`, `.sec`, `.btn-danger`, `.btn-icon-svg`, modal/toast styling, footer styling, per-module scoped overrides). `css/callback-whatsapp.css` is the one module-specific stylesheet (WhatsApp tab's phone mockup, tabs, history list) and reuses the same custom properties with fallback values (`var(--accent, #0b5394)`) since it's a separate file loaded after `styles.css`.
+`styles.css` defines the shared design tokens in `:root` (`--accent`, `--surface`, `--border`, `--radius-*`, `--shadow-*`, `--transition-*`, plus dedicated `--sidebar-*` tokens for the dark sidebar) and all global element/utility rules (`button`, `.sec`, `.btn-danger`, `.btn-icon-svg`, modal/toast styling, footer styling, per-module scoped overrides). `css/callback-whatsapp.css` is the one module-specific stylesheet (WhatsApp tab's phone mockup, tabs, subject optgroups) and reuses the same custom properties with fallback values (`var(--accent, #0b5394)`) since it's a separate file loaded after `styles.css`.
 
-A number of CSS classes are toggled directly by JS at runtime and must keep their exact names even when restyled: `.module`/`.active` (module + sidebar nav), `.cbw-tab-btn.ativo`, `.cbw-campo-erro`, `.cbw-badge-ok`/`.cbw-badge-pendente`, `.cbw-preview-vazio`, `.cbw-bolha-vazia`, `#modal-mapa` / `#modalTabela` display toggling. When restyling, change values, not selector names.
+A number of CSS classes are toggled directly by JS at runtime and must keep their exact names even when restyled: `.module`/`.active` (module + sidebar nav), `.cbw-tab-btn.ativo`, `.cbw-campo-erro`, `.cbw-preview-vazio`, `.cbw-bolha-vazia`, `#modal-mapa` / `#modalTabela` display toggling. When restyling, change values, not selector names.
 
 Note: a CSS section in `styles.css` is still labeled `/* ===== EFEITOS EQUIPES ===== */` even though the rules under it (`.footer-global` and friends) are the current global footer, unrelated to the old Equipes module — the label is stale but the rules themselves are live and in use. Left as-is in etapa 3.1 (comment-only, non-functional); fine to relabel in a future pass.
 
