@@ -45,7 +45,8 @@ Todo o "banco de dados" desta demo é simulado inteiramente no navegador:
   sai do seu navegador, nenhuma informação é enviada a servidor nenhum. Qualquer outra rota
   `/api/*` recebe uma resposta segura (nunca erro de rede), como proteção extra.
 - **`js/auth.js`** faz a checagem de usuário/senha localmente, sem nenhuma chamada de rede.
-- O **Callback WhatsApp** já usava `localStorage` no projeto original — continua igual.
+- O **Callback WhatsApp** não grava nada: o antigo histórico local foi removido (ao abrir, o
+  módulo apaga somente a chave antiga `coi_callback_whatsapp_historico`).
 - Os mapas usam arquivos GeoJSON estáticos já incluídos em `geodata/` (limites municipais
   públicos do IBGE/OSM) e a biblioteca Leaflet (CDN).
 
@@ -65,7 +66,11 @@ ou abrir em uma aba anônima.
   localidade não tem contorno próprio no GeoJSON, o módulo reaproveita o contorno do
   MUNICÍPIO inteiro como aproximação (**fallback municipal**) — sinalizado visualmente por um
   traço tracejado e um selo "nível municipal" (nunca escondido, nunca com posição inventada).
-- **Callback WhatsApp** — gera links `wa.me` e mantém histórico local no navegador.
+- **Callback WhatsApp** — preenchimento manual de incidente e telefone; 23 mensagens prontas da
+  Central Callback Web 1.1.0, agrupadas por assunto; abre direto o WhatsApp Web
+  (`web.whatsapp.com/send`) em uma única aba nova. Não envia nada: o operador envia manualmente.
+- **Central Callback Web** (menu ATENDIMENTO) — apenas um link externo: abre
+  https://thiagoshield199403-svg.github.io/central-callback/ em nova aba.
 - **Tabelas Técnicas** — conteúdo estático inalterado.
 - **Passagem de Turno** (menu GESTÃO) — apenas um link externo: abre o sistema real de
   passagem de turno (Microsoft Power Apps) em nova aba. Não há módulo local nem
@@ -141,6 +146,7 @@ node js/equipes.test.js
 node js/mapa.test.js
 node js/mapas-regionais.test.js
 node js/auth.test.js
+node js/callback-whatsapp.test.js
 node js/scripts-campo/bloqueios.test.js
 node js/scripts-campo/desarme.test.js
 node js/scripts-campo/preenchimento-ss.test.js
