@@ -78,6 +78,20 @@ ou abrir em uma aba anônima.
 - **Escala** (menu GESTÃO) — apenas um link externo: abre a escala operacional
   (GitHub Pages) em nova aba. Não há tela local.
 
+## Fundo animado natalino
+
+Durante o período de Natal, a tela de login e a área ao redor dos módulos exibem uma cena 3D
+animada (sala de operação, bola de vidro com equipe de campo, árvore e torre de transmissão),
+em loop contínuo de 20 s, sem áudio e sem marcas ou textos. É só decoração: fica atrás de toda
+a interface e não altera nenhum módulo.
+
+- Arquivos: `assets/natal/` (WebM VP9 e MP4 H.264 em 1080p, MP4 720p e imagens estáticas),
+  `css/fundo-natal.css` e `js/fundo-natal.js`.
+- Escolha automática: imagem estática se o sistema pedir menos movimento ou economia de dados;
+  720p em máquinas com poucos recursos ou telas pequenas; WebM quando o navegador suporta VP9,
+  senão MP4. O vídeo pausa com a aba oculta.
+- **Desligar:** `FUNDO_NATAL_ATIVO = false` em `js/fundo-natal.js` (ou abrir com `?natal=0`).
+
 ## Módulos pausados nesta demo
 
 Aparece no menu, mas mostra "Em desenvolvimento" ao ser aberto — **não faz nenhuma
@@ -147,6 +161,7 @@ node js/mapa.test.js
 node js/mapas-regionais.test.js
 node js/auth.test.js
 node js/callback-whatsapp.test.js
+node js/fundo-natal.test.js
 node js/scripts-campo/bloqueios.test.js
 node js/scripts-campo/desarme.test.js
 node js/scripts-campo/preenchimento-ss.test.js

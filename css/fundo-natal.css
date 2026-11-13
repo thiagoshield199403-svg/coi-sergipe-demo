@@ -1,0 +1,53 @@
+/* ===== FUNDO ANIMADO NATALINO =====
+   Camada decorativa independente, criada por js/fundo-natal.js (só existe com a classe html.natal-ativo).
+   Não altera nenhum módulo: fica ATRÁS de tudo com z-index:-1 (sem criar novo contexto de empilhamento no
+   .app), então modais, rodapé e toasts mantêm a mesma ordem de sobreposição de antes.
+   Os cartões dos módulos (.container) continuam opacos — o fundo aparece só ao redor deles. */
+
+html.natal-ativo{
+  background:#05080f;
+}
+
+/* o fundo do body pintaria por cima da camada z-index:-1; com o natal ativo ele fica transparente */
+html.natal-ativo body{
+  background:transparent;
+}
+
+.natal-bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  overflow:hidden;
+  pointer-events:none;
+  background:#05080f url("../assets/natal/natal-coi-poster-720.jpg") center / cover no-repeat;
+}
+
+.natal-bg video,
+.natal-bg img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* véu escuro: reduz o contraste do fundo para não competir com os cartões e o texto */
+.natal-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg, rgba(4,8,16,.55) 0, rgba(4,8,16,.30) 40%, rgba(4,8,16,.30) 75%, rgba(4,8,16,.45) 100%);
+}
+
+/* tela de login: o gradiente opaco vira um véu translúcido para a cena aparecer atrás do cartão */
+html.natal-ativo #login-screen{
+  background: linear-gradient(160deg, rgba(27,31,39,.55) 0%, rgba(6,47,87,.45) 100%);
+}
+
+/* ...mas a interface do sistema continua escondida atrás do login, como era com o fundo opaco.
+   js/auth.js esconde o login com style.display = "none" ao entrar e o mostra de novo ao sair. */
+html.natal-ativo body:has(#login-screen:not([style*="none"])) .app,
+html.natal-ativo body:has(#login-screen:not([style*="none"])) .footer-global{
+  visibility:hidden;
+}

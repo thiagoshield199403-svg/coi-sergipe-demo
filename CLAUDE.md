@@ -35,6 +35,7 @@ There is no test suite or linter. To sanity-check an edit without a browser:
 - `js/core.js` — `showToast()`, `openModule()`, `atualizarRodape()` (footer clock, self-scheduling via `setInterval`). This is the sole definition of these three functions; do not redefine them elsewhere (index.html used to duplicate them inline — removed in etapa 3.1).
 - `js/utilitarios.js` — `abrirMapa()`/`fecharMapa()` for the map modal (`#modal-mapa`). Sole definition; index.html used to duplicate these inline — removed in etapa 3.1.
 - `js/mensagens.js`, `js/callback-whatsapp.js` — the Callback WhatsApp module, see below.
+- `js/fundo-natal.js` (+ `css/fundo-natal.css`, `assets/natal/`) — decorative animated Christmas background, independent of every module. Creates `.natal-bg` (fixed, `z-index:-1`, so no new stacking context: modals/footer/toasts keep their order) and adds `html.natal-ativo`; while the login screen is visible it hides `.app`/`.footer-global` via `:has()` (same as the old opaque login gradient). Turn off with `FUNDO_NATAL_ATIVO = false` or `?natal=0`. Pure picker `fundoNatalEscolherFonte()` tested in `js/fundo-natal.test.js`.
 
 `abrirTabela()`/`fecharTabela()` (Tabelas Técnicas modal) and `abrirEscala()`/`abrirPassagemTurno()`/`abrirCentralCallback()` (external links) remain defined inline in `index.html`'s own `<script>` blocks — they have no JS-file counterpart and are not duplicated.
 
