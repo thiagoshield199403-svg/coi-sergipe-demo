@@ -19,6 +19,10 @@
      (Bloqueio LV, e futuramente Trafo/Poste/Sinergia/Desarme/SS) — ver
      css/scripts-campo.css. -->
 <link rel="stylesheet" href="css/scripts-campo.css">
+<!-- FUNDO ANIMADO NATALINO: camada decorativa independente atrás de todo o
+     sistema (vídeo em assets/natal/) — ver css/fundo-natal.css e
+     js/fundo-natal.js. Não altera nenhum módulo. -->
+<link rel="stylesheet" href="css/fundo-natal.css">
 <!-- MAPA OPERACIONAL: Leaflet via CDN (sem bundler/build no projeto — mesmo
      motivo pelo qual não há empacotador para os demais scripts). Só é usado
      dentro da aba "Mapa Operacional"; se o CDN estiver inacessível, o
@@ -2046,6 +2050,9 @@
 <script src="js/scripts-campo/preenchimento-ss.js"></script>
 <script src="js/scripts-campo/substituicao-poste.js"></script>
 <script src="js/scripts-campo/substituicao-transformador.js"></script>
+<!-- FUNDO ANIMADO NATALINO: independente dos demais scripts (desligar com
+     FUNDO_NATAL_ATIVO = false ou ?natal=0) — ver js/fundo-natal.js. -->
+<script src="js/fundo-natal.js"></script>
 
 
 <script>
