@@ -51,3 +51,20 @@ html.natal-ativo body:has(#login-screen:not([style*="none"])) .app,
 html.natal-ativo body:has(#login-screen:not([style*="none"])) .footer-global{
   visibility:hidden;
 }
+
+/* com o sistema aberto, o vídeo ocupa só a ÁREA VISÍVEL (entre a barra lateral e o rodapé fixo), não a
+   janela inteira: assim ele é dimensionado para essa área e a cena aparece quase inteira, em vez de ter a
+   parte esquerda escondida atrás da barra lateral opaca (efeito de "zoom"). No login a tela cheia continua. */
+html.natal-ativo body:has(#login-screen[style*="none"]) .natal-bg{
+  left: var(--sidebar-width, 248px);
+  bottom: 52px; /* altura do .footer-global */
+}
+/* Gestão de Equipes (tela ampla) esconde a barra lateral; no celular ela fica em cima, não ao lado */
+html.natal-ativo body.modo-tela-ampla:has(#login-screen[style*="none"]) .natal-bg{
+  left: 0;
+}
+@media(max-width:820px){
+  html.natal-ativo body:has(#login-screen[style*="none"]) .natal-bg{
+    left: 0;
+  }
+}
