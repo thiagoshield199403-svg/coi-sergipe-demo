@@ -1,5 +1,5 @@
-/* Testes puros (sem framework, sem dependência nova) da escolha de versão do fundo natalino
-   (fundoNatalEscolherFonte em js/fundo-natal.js) e da presença dos arquivos que ela referencia.
+/* Testes puros (sem framework, sem dependência nova) do fundo natalino (js/fundo-natal.js):
+   dados das luzes, ritmo do pisca-pisca e presença da fotografia referenciada pelo CSS.
 
    Roda com Node puro:
        node js/fundo-natal.test.js
@@ -8,9 +8,9 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const {fundoNatalEscolherFonte} = require("./fundo-natal.js");
+const {fundoNatalRitmo, FUNDO_NATAL_LUZES} = require("./fundo-natal.js");
 
-const PASTA = path.join(__dirname, "..", "assets", "natal");
+const RAIZ = path.join(__dirname, "..");
 let ok = 0;
 function teste(nome, fn) {
   fn();
@@ -18,36 +18,44 @@ function teste(nome, fn) {
   console.log("✓ " + nome);
 }
 
-const desktop = {reduzirMovimento: false, economiaDados: false, nucleos: 8, memoriaGB: 8, ladoMaiorPx: 1920, vp9: true};
-
-teste("menos movimento → imagem estática", () => {
-  assert.equal(fundoNatalEscolherFonte({...desktop, reduzirMovimento: true}).tipo, "imagem");
+teste("todas as luzes têm posição dentro da foto (0–100%) e cor válida", () => {
+  assert.ok(FUNDO_NATAL_LUZES.length > 0);
+  for (const [x, y, cor] of FUNDO_NATAL_LUZES) {
+    assert.ok(x >= 0 && x <= 100 && y >= 0 && y <= 100, `${x},${y}`);
+    assert.ok(["r", "g", "z", "a", "b"].includes(cor), cor);
+  }
 });
-teste("economia de dados → imagem estática", () => {
-  assert.equal(fundoNatalEscolherFonte({...desktop, economiaDados: true}).tipo, "imagem");
+teste("as cinco cores do pisca-pisca aparecem (vermelho, verde, azul, amarelo, branco quente)", () => {
+  const cores = new Set(FUNDO_NATAL_LUZES.map((l) => l[2]));
+  for (const c of ["r", "g", "z", "a", "b"]) assert.ok(cores.has(c), c);
 });
-teste("desktop com VP9 → WebM 1080p com MP4 de reserva", () => {
-  const e = fundoNatalEscolherFonte(desktop);
-  assert.deepEqual(e.fontes.map((f) => f[0]), ["natal-coi-1080p.webm", "natal-coi-1080p.mp4"]);
+teste("ritmo suave: duração entre 2,4 s e 5,6 s (sem estroboscópio)", () => {
+  for (let i = 0; i < FUNDO_NATAL_LUZES.length; i++) {
+    const r = fundoNatalRitmo(i);
+    assert.ok(r.dur >= 2.4 && r.dur <= 5.6, String(r.dur));
+    assert.ok(r.atraso <= 0 && -r.atraso <= r.dur, String(r.atraso));
+    assert.ok(r.min >= 0.03 && r.min <= 0.12 && r.pico >= 0.9 && r.pico <= 1, `${r.min}/${r.pico}`);
+  }
 });
-teste("sem VP9 → MP4 1080p", () => {
-  assert.deepEqual(fundoNatalEscolherFonte({...desktop, vp9: false}).fontes.map((f) => f[0]), ["natal-coi-1080p.mp4"]);
+teste("luzes piscam em momentos diferentes (ritmos variados)", () => {
+  const duracoes = new Set(FUNDO_NATAL_LUZES.map((_, i) => fundoNatalRitmo(i).dur));
+  assert.ok(duracoes.size > FUNDO_NATAL_LUZES.length / 2);
 });
-teste("4 núcleos → 720p", () => {
-  assert.deepEqual(fundoNatalEscolherFonte({...desktop, nucleos: 4}).fontes.map((f) => f[0]), ["natal-coi-720p.mp4"]);
+teste("ritmo é determinístico (mesmo resultado a cada carga)", () => {
+  assert.deepEqual(fundoNatalRitmo(7), fundoNatalRitmo(7));
 });
-teste("4 GB de memória → 720p", () => {
-  assert.deepEqual(fundoNatalEscolherFonte({...desktop, memoriaGB: 4}).fontes.map((f) => f[0]), ["natal-coi-720p.mp4"]);
+teste("a fotografia referenciada pelo CSS existe", () => {
+  const css = fs.readFileSync(path.join(RAIZ, "css", "fundo-natal.css"), "utf8");
+  const m = css.match(/url\("\.\.\/(assets\/natal\/[^"]+)"\)/);
+  assert.ok(m, "url() da foto no CSS");
+  assert.equal(m[1], "assets/natal/fundo-coi-natal.png");
+  assert.ok(fs.statSync(path.join(RAIZ, m[1])).size > 0);
 });
-teste("tela pequena → 720p", () => {
-  assert.deepEqual(fundoNatalEscolherFonte({...desktop, ladoMaiorPx: 1366}).fontes.map((f) => f[0]), ["natal-coi-720p.mp4"]);
-});
-teste("capacidades desconhecidas (navegador não informa) → trata como desktop", () => {
-  assert.equal(fundoNatalEscolherFonte({...desktop, nucleos: undefined, memoriaGB: undefined}).fontes[0][0], "natal-coi-1080p.webm");
-});
-teste("todos os arquivos referenciados existem em assets/natal/", () => {
-  const nomes = ["natal-coi-1080p.webm", "natal-coi-1080p.mp4", "natal-coi-720p.mp4", "natal-coi-poster.jpg", "natal-coi-poster-720.jpg"];
-  for (const n of nomes) assert.ok(fs.statSync(path.join(PASTA, n)).size > 0, n);
+teste("o fundo antigo (vídeo/pôster) não é mais referenciado", () => {
+  for (const f of ["index.html", "css/fundo-natal.css", "js/fundo-natal.js"]) {
+    const txt = fs.readFileSync(path.join(RAIZ, f), "utf8");
+    assert.ok(!/natal-coi-|\.webm|\.mp4/.test(txt), f);
+  }
 });
 
 console.log(`\n${ok} testes ok`);

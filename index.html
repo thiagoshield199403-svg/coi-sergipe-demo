@@ -4,7 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>COI Sergipe</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230b5394'%3E%3Cpath d='M13 2 4 14h7l-1 8 9-12h-7l1-8z'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff7a1a'%3E%3Cpath d='M13 2 4 14h7l-1 8 9-12h-7l1-8z'/%3E%3C/svg%3E">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#050a14">
+<!-- Menu recolhido: aplica a preferência antes da primeira pintura (sem
+     "abrir e fechar" ao recarregar). Mesma chave de js/layout-ui.js. -->
+<script>try{if(localStorage.getItem("coi_ui_menu_recolhido")==="1")document.documentElement.classList.add("sidebar-recolhida");}catch(e){}</script>
+
+<!-- Tipografia (Inter). Se o Google Fonts estiver inacessível, o sistema cai
+     para Segoe UI / fonte do sistema — nada depende desta fonte. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="css/callback-whatsapp.css">
@@ -12,15 +23,14 @@
 <link rel="stylesheet" href="css/admin.css">
 <link rel="stylesheet" href="css/equipes.css">
 <link rel="stylesheet" href="css/mapa.css">
-<!-- MAPAS DAS REGIONAIS: módulo novo e independente (não reaproveita
-     classes de css/mapa.css) — ver css/mapas-regionais.css. -->
-<link rel="stylesheet" href="css/mapas-regionais.css">
+<!-- MAPA REGIONAL INTERATIVO (SVG, único módulo de mapas regionais) — ver css/mapa-regional.css. -->
+<link rel="stylesheet" href="css/mapa-regional.css">
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup
      (Bloqueio LV, e futuramente Trafo/Poste/Sinergia/Desarme/SS) — ver
      css/scripts-campo.css. -->
 <link rel="stylesheet" href="css/scripts-campo.css">
-<!-- FUNDO ANIMADO NATALINO: camada decorativa independente atrás de todo o
-     sistema (vídeo em assets/natal/) — ver css/fundo-natal.css e
+<!-- FUNDO NATALINO: camada decorativa independente atrás de todo o
+     sistema (foto em assets/natal/ + pisca-pisca) — ver css/fundo-natal.css e
      js/fundo-natal.js. Não altera nenhum módulo. -->
 <link rel="stylesheet" href="css/fundo-natal.css">
 <!-- MAPA OPERACIONAL: Leaflet via CDN (sem bundler/build no projeto — mesmo
@@ -163,14 +173,11 @@
           <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span class="menu-label">Gestão de Equipes</span>
         </button>
-        <!-- Item antigo "Mapa Regionais" (galeria de imagens estáticas,
-             módulo #mapas_regionais) removido do menu — substituído por este
-             módulo interativo. O HTML do módulo antigo (#mapas_regionais)
-             permanece no arquivo por enquanto, só sem nenhum botão de menu
-             apontando pra ele; nenhuma limpeza/remoção de código nesta etapa. -->
-        <button onclick="openModule('mapas_territoriais', this); regtmAoAbrir();">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/><circle cx="12" cy="9" r="2"/></svg>
-          <span class="menu-label">Mapas das Regionais</span>
+        <!-- MAPA REGIONAL INTERATIVO: único módulo de mapas das regionais (o antigo
+             "Mapas das Regionais", Leaflet, foi removido) — ver js/mapa-regional.js. -->
+        <button onclick="openModule('mapa_regional_interativo', this); mapaRegionalAoAbrir();">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 20.5 7 20.5 17 12 22 3.5 17 3.5 7 12 2"/><polyline points="3.5 7 12 12 20.5 7"/><line x1="12" y1="12" x2="12" y2="22"/></svg>
+          <span class="menu-label">Mapa Regional Interativo</span>
         </button>
       </div>
     </div>
@@ -247,7 +254,7 @@
   <!-- ===== UTILITÁRIO COI ===== -->
   <div class="menu-categoria" data-categoria="utilitario">
     <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
-      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
       <span class="menu-cat-label">Utilitário COI</span>
       <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
@@ -272,7 +279,7 @@
   <!-- ===== GESTÃO ===== -->
   <div class="menu-categoria" data-categoria="gestao">
     <button type="button" class="menu-categoria-toggle" onclick="menuAlternarCategoria(this)" aria-expanded="false">
-      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <svg class="menu-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
       <span class="menu-cat-label">Gestão</span>
       <svg class="menu-cat-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
@@ -322,7 +329,7 @@
     <div class="menu-categoria-itens-wrap">
       <div class="menu-categoria-itens">
         <button onclick="abrirEmDesenvolvimento('Administração', this)">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
           <span class="menu-label">Administração</span>
         </button>
       </div>
@@ -332,20 +339,15 @@
 </div>
 
 
-<div class="sidebar-footer premium-footer">
-    <div class="status-indicator"></div>
-
-    <div class="system-info">
-        <div class="status-line">
-            <span class="status-text">ONLINE</span>
-            <span class="status-dot"></span>
-        </div>
-
-        <div class="system-name">COI OPERACIONAL</div>
-        <div class="system-time" id="dataHoraSistema"></div>
-    </div>
+<!-- Rodapé da barra lateral: só o botão de recolher/expandir o menu (o antigo
+     bloco ONLINE / COI OPERACIONAL / relógio foi retirado na modernização
+     visual). Comportamento em js/layout-ui.js. -->
+<div class="sidebar-rodape">
+  <button type="button" class="sidebar-recolher" id="sidebar_btn_recolher" aria-expanded="true" aria-label="Recolher menu" title="Recolher menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+    <span class="sidebar-recolher-label">Recolher menu</span>
+  </button>
 </div>
-
 
 </div>
 
@@ -353,13 +355,78 @@
 <!-- ===== CONTENT ===== -->
 <div class="content">
 
+  <!-- ===== BARRA SUPERIOR =====
+       Identificação do módulo aberto (preenchida por js/layout-ui.js a partir
+       do item ativo do menu) e usuário logado. O bloco #auth_usuario_badge
+       (nome, Meu Perfil, Sair) veio do rodapé — mesmos ids, controlado por
+       js/auth.js exatamente como antes. -->
+  <header class="topbar">
+    <div class="topbar-titulo">
+      <span class="topbar-trilha" id="topbar_trilha">COI Sergipe</span>
+      <h1 class="topbar-modulo" id="topbar_modulo">Início</h1>
+    </div>
+
+    <div class="auth-usuario-badge" id="auth_usuario_badge">
+      <span class="auth-usuario-avatar" id="auth_usuario_avatar" aria-hidden="true"></span>
+      <span class="auth-usuario-info">
+        <span class="auth-usuario-nome" id="auth_usuario_nome"></span>
+        <span class="auth-usuario-papel">Operador COI</span>
+      </span>
+      <button type="button" class="auth-usuario-perfil" id="auth_btn_meu_perfil" title="Meu Perfil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Meu Perfil</span>
+      </button>
+      <button type="button" class="auth-usuario-sair" id="auth_btn_sair" title="Sair">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Sair</span>
+      </button>
+    </div>
+  </header>
+
   <!-- ===== INÍCIO ===== -->
   <div id="inicio" class="module active">
     <div class="container">
-      <h2>Bem-vindo ao Sistema COI</h2>
-      <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
-        Centro de Operação Integrado — selecione uma ferramenta no menu ao lado.
-      </p>
+      <div class="inicio-hero">
+        <h2>Bem-vindo ao Sistema COI</h2>
+        <p class="texto-sub">Centro de Operação Integrado — selecione uma ferramenta no menu ao lado ou use um atalho abaixo.</p>
+      </div>
+
+      <!-- Atalhos: cada um só "clica" no item correspondente do menu lateral
+           (data-atalho = trecho do onclick do item — ver js/layout-ui.js), então
+           a lógica de abertura continua sendo exatamente a do menu. -->
+      <div class="inicio-atalhos">
+        <button type="button" class="inicio-atalho" data-atalho="openModule('equipes'">
+          <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="inicio-atalho-titulo">Gestão de Equipes</span>
+          <span class="inicio-atalho-desc">Equipes do dia por polo, status e mapa operacional.</span>
+        </button>
+        <button type="button" class="inicio-atalho" data-atalho="openModule('mapa_regional_interativo'">
+          <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
+          <span class="inicio-atalho-titulo">Mapa Regional Interativo</span>
+          <span class="inicio-atalho-desc">Os 58 municípios das 5 regionais, com número operacional.</span>
+        </button>
+        <button type="button" class="inicio-atalho" data-atalho="openModule('callback'">
+          <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
+          <span class="inicio-atalho-titulo">Callback WhatsApp</span>
+          <span class="inicio-atalho-desc">Mensagens padronizadas e personalizadas ao cliente.</span>
+        </button>
+        <button type="button" class="inicio-atalho" data-atalho="openModule('bloqueios_lv'">
+          <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span>
+          <span class="inicio-atalho-titulo">Scripts de Campo</span>
+          <span class="inicio-atalho-desc">Bloqueio LV, Sinergia, Desarme, SS, Poste e Trafo.</span>
+        </button>
+        <button type="button" class="inicio-atalho" data-atalho="abrirTabela(">
+          <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></span>
+          <span class="inicio-atalho-titulo">Tabelas Técnicas</span>
+          <span class="inicio-atalho-desc">Referências técnicas de consulta rápida.</span>
+        </button>
+        <button type="button" class="inicio-atalho" data-atalho="abrirCentralCallback(">
+          <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          <span class="inicio-atalho-titulo">Central Callback Web</span>
+          <span class="inicio-atalho-desc">Aplicação oficial do callback.</span>
+          <span class="inicio-atalho-externo">Abre em nova aba</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -374,7 +441,7 @@
   <div id="em_desenvolvimento" class="module">
     <div class="container">
       <h2>Em desenvolvimento</h2>
-      <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
+      <p class="texto-sub">
         O módulo "<span id="em_dev_nome">Este recurso</span>" não está disponível nesta versão demonstrativa
         (depende de backend/banco de dados, que a demo não usa).
       </p>
@@ -391,7 +458,7 @@
   <div id="material_removido" class="module">
     <div class="container">
       <h2>Material operacional interno removido da versão demonstrativa.</h2>
-      <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
+      <p class="texto-sub">
         Este item exibia um material com informações operacionais internas reais e foi
         removido desta cópia pública por segurança.
       </p>
@@ -907,7 +974,7 @@
   <div id="substituicao_poste" class="module">
     <div class="container">
 
-      <h2>🛠️ Substituição de Poste</h2>
+      <h2>Substituição de Poste</h2>
 
       <div class="linha-5-rel">
         <div><label for="sp_operador">Operador:</label><input id="sp_operador" required></div>
@@ -1107,7 +1174,7 @@
   <div id="substituicao_transformador" class="module">
     <div class="container">
 
-      <h2>🔁 Substituição de Transformador</h2>
+      <h2>Substituição de Transformador</h2>
 
       <div class="linha-6">
         <div>
@@ -1258,66 +1325,49 @@
     </div>
   </div>
 
-  <!-- =====///////////////// MAPAS REGIONAIS/////////////////// =====
-       Módulo já sem nenhum botão de menu apontando pra ele desde antes
-       desta demo (ver comentário na categoria "Operação" acima). VERSÃO
-       DEMONSTRATIVA: as 5 imagens originais (mapas/mapa1.jpg a mapa5.jpg)
-       continham códigos de despacho operacional reais por município —
-       deletadas desta cópia; conteúdo substituído pelo placeholder abaixo
-       em vez de deixar <img> quebradas apontando para arquivos removidos. -->
-<div id="mapas_regionais" class="module">
-  <div class="container">
-    <h2>Material operacional interno removido da versão demonstrativa.</h2>
-    <p style="text-align:center; margin-top:-10px; margin-bottom:20px; color:#555;">
-      Este módulo exibia mapas com códigos de despacho operacional internos reais e foi
-      removido desta cópia pública por segurança.
-    </p>
-  </div>
-</div>
-
-
-<!-- =====///////////////// MAPAS DAS REGIONAIS (novo, independente) /////////////////// =====
-     Etapa 1 — esqueleto: seletor de Polo/Regional (sem carregar GeoJSON
-     ainda), área reservada do mapa (segunda instância Leaflet própria,
-     ver js/mapas-regionais.js) e painel lateral reservado para a futura
-     legenda/informações territoriais. Nenhuma classe/id daqui é
-     compartilhada com o Mapa Operacional da Gestão de Equipes. -->
-<div id="mapas_territoriais" class="module">
-  <div class="container">
-
-    <h2>🗺️ Mapas das Regionais</h2>
-
-    <div class="regtm-topo">
-      <div class="regtm-campo-seletor">
-        <label for="regtm_select_polo">Regional / Polo</label>
-        <select id="regtm_select_polo" class="regtm-select">
-          <option value="">Selecione uma regional</option>
-        </select>
+<!-- =====///////////////// MAPA REGIONAL INTERATIVO /////////////////// =====
+     Único módulo de mapas das regionais (substituiu o antigo "Mapas das
+     Regionais" em Leaflet, removido).
+     Mapa vetorial (SVG) das 5 regionais a partir da malha oficial do IBGE
+     (geodata/ → ferramentas/gerar-mapa-regional.js → js/mapa-regional/geometria.js).
+     Abas, mapa, lista e painel são montados por js/mapa-regional.js. Os
+     números dos polos vêm da base estática js/mapa-regional/dados.js e
+     aparecem assim que o módulo abre: no mapa SOMENTE o número; na lista,
+     no tooltip e no painel "número — nome". -->
+<div id="mapa_regional_interativo" class="module">
+  <div class="container" id="mr_raiz">
+    <div class="mr-cabecalho">
+      <div>
+        <h2>Mapa Regional Interativo</h2>
+        <p class="texto-sub">Malha municipal oficial do IBGE · número do polo sobre cada município · passe o mouse para identificar, clique para selecionar.</p>
       </div>
-      <div class="regtm-selecao-indicador" id="regtm_selecao_indicador" data-regtm-vazio="true">
-        Nenhuma regional selecionada ainda.
-      </div>
+      <div class="mr-abas" role="tablist" aria-label="Regionais"></div>
     </div>
 
-    <div class="regtm-layout">
-      <div class="regtm-mapa-wrap">
-        <div id="mapas_territoriais_mapa" class="regtm-mapa"></div>
+    <div class="mr-layout">
+      <div class="mr-palco">
+        <div class="mr-tooltip" role="status" aria-live="polite"></div>
       </div>
 
-      <div class="regtm-painel-lateral" id="regtm_painel_lateral">
-        <h3>Legenda / Informações</h3>
-        <div class="regtm-painel-vazio">Reservado para a próxima etapa (legenda territorial e detalhes da localidade selecionada).</div>
-      </div>
+      <aside class="mr-painel">
+        <div class="mr-ficha mr-ficha-vazia"></div>
+        <div class="mr-legenda">
+          <div class="mr-legenda-cabecalho">
+            <span>Municípios</span>
+            <span class="mr-legenda-contagem"></span>
+          </div>
+          <ul class="mr-legenda-lista"></ul>
+        </div>
+      </aside>
     </div>
-
+    <p class="mr-rodape-fonte">Fonte dos limites: IBGE — malha territorial oficial (geodata/).</p>
   </div>
 </div>
-
 
 <!-- ///////////////CALLBACK WHATSAPP///////////////////////// -->
 <div id="callback" class="module">
 <div class="container">
-<h2>CALLBACK WHATSAPP</h2>
+<h2>Callback WhatsApp</h2>
 
 <div id="cbw_painel_whatsapp">
   <div class="cbw-layout">
@@ -2000,32 +2050,14 @@
 </div>
 
     
-<div class="footer-global">
-  <div class="footer-left">
-    <div class="coi-wordmark coi-wordmark--sm" role="img" aria-label="COI Sergipe">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
-      <span class="coi-wordmark-texto">COI<span>SERGIPE</span></span>
-    </div>
+<!-- RODAPÉ: somente a assinatura. Nome do operador, Meu Perfil e Sair estão na
+     barra superior (.topbar); status ONLINE e relógio foram retirados. -->
+<footer class="footer-global">
+  <div class="footer-assinatura">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span>Desenvolvido por <strong>Thiago Araújo</strong> <span class="footer-sep">|</span> <span class="footer-marca">COI SERGIPE</span></span>
   </div>
-
-  <div class="footer-center">
-    <div class="footer-status">
-      <span class="dot"></span>
-      <span class="status-text">ONLINE</span>
-    </div>
-
-    <div class="footer-msg">
-      🔒 Sistema desenvolvido por Thiago Araujo • COI SERGIPE
-    </div>
-  </div>
-
-  <div class="auth-usuario-badge" id="auth_usuario_badge">
-    <span class="auth-usuario-nome" id="auth_usuario_nome"></span>
-    <button type="button" class="auth-usuario-perfil" id="auth_btn_meu_perfil">Meu Perfil</button>
-    <button type="button" class="auth-usuario-sair" id="auth_btn_sair">Sair</button>
-  </div>
-
-</div>
+</footer>
 <!-- VERSÃO DEMONSTRATIVA: precisa carregar ANTES de qualquer outro script —
      intercepta window.fetch para simular o backend (ver js/demo-backend.js). -->
 <script src="js/demo-backend.js"></script>
@@ -2038,10 +2070,15 @@
 <script src="js/mensagens.js"></script>
 <script src="js/callback-whatsapp.js"></script>
 <script src="js/utilitarios.js"></script>
-<!-- MAPAS DAS REGIONAIS: módulo novo e independente, carregado depois de
-     js/mapa.js de propósito — não depende dele, só evita qualquer dúvida
-     de ordem (ver js/mapas-regionais.js). -->
-<script src="js/mapas-regionais.js"></script>
+<!-- MAPA REGIONAL INTERATIVO: base dos polos (códigos + IBGE), geometria
+     gerada do IBGE e controlador. Tudo por <script> — funciona em file://. -->
+<script src="js/mapa-regional/dados.js"></script>
+<script src="js/mapa-regional/geometria.js"></script>
+<!-- Expansão: Regional Aracaju, São Cristóvão e Itaporanga d'Ajuda — geometria (municípios,
+     bairros, pontos) e metadados das subdivisões, gerados de geodata/ibge-2022/. -->
+<script src="js/mapa-regional/geometria-expansao.js"></script>
+<script src="js/mapa-regional/subdivisoes.js"></script>
+<script src="js/mapa-regional.js"></script>
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup, um
      arquivo por ferramenta, cada um isolado (ver auditoria). -->
 <script src="js/scripts-campo/bloqueios.js"></script>
@@ -2050,9 +2087,12 @@
 <script src="js/scripts-campo/preenchimento-ss.js"></script>
 <script src="js/scripts-campo/substituicao-poste.js"></script>
 <script src="js/scripts-campo/substituicao-transformador.js"></script>
-<!-- FUNDO ANIMADO NATALINO: independente dos demais scripts (desligar com
+<!-- FUNDO NATALINO: independente dos demais scripts (desligar com
      FUNDO_NATAL_ATIVO = false ou ?natal=0) — ver js/fundo-natal.js. -->
 <script src="js/fundo-natal.js"></script>
+<!-- INTERFACE: menu recolhível, título do módulo na barra superior e atalhos
+     do Início — só apresentação, não altera a lógica de nenhum módulo. -->
+<script src="js/layout-ui.js"></script>
 
 
 <script>

@@ -1,6 +1,8 @@
-/* ===== TELA DE LOGIN (etapa 6) =====
+/* ===== TELA DE LOGIN (etapa 6) — tema escuro =====
    Arquivo carregado depois de styles.css — usa os mesmos custom properties,
-   sempre com fallback, seguindo o padrão de css/callback-whatsapp.css. */
+   sempre com fallback. Classes alternadas por js/auth.js mantidas:
+   .login-view/.ativo, .login-erro/.login-sucesso/.mostrar,
+   .auth-usuario-badge/.mostrar. */
 
 #login-screen{
   position:fixed;
@@ -9,58 +11,77 @@
   display:flex;
   align-items:center;
   justify-content:center;
-  background: linear-gradient(160deg, var(--sidebar-bg-elevated, #1b1f27) 0%, var(--azul-escuro, #062f57) 100%);
   padding:20px;
+  overflow-y:auto;
+  background:
+    radial-gradient(900px 500px at 50% 0%, rgba(31,111,235,.18) 0%, transparent 60%),
+    linear-gradient(160deg, var(--sidebar-bg, #050b17) 0%, var(--azul-escuro, #061226) 100%);
 }
 
 .login-card{
+  position:relative;
   width:100%;
-  max-width:380px;
-  background: var(--surface, #fff);
-  border-radius: var(--radius-lg, 16px);
-  padding:32px 28px 26px;
-  border:1px solid var(--border, rgba(15,23,42,.09));
-  border-top:3px solid #ff7a00;
-  box-shadow: var(--shadow-lg, 0 20px 44px -12px rgba(15,23,42,.22));
+  max-width:392px;
+  margin:auto;
+  padding:30px 28px 24px;
+  background:rgba(9,17,32,.86);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  backdrop-filter:blur(18px) saturate(140%);
+  border:1px solid var(--border-strong, rgba(148,175,220,.22));
+  border-radius:var(--radius-xl, 20px);
+  box-shadow:var(--shadow-lg, 0 24px 56px -16px rgba(0,0,0,.75)), inset 0 1px 0 rgba(255,255,255,.05);
+}
+/* detalhe laranja discreto no topo (mesmo dos cards) */
+.login-card::before{
+  content:"";
+  position:absolute;
+  top:-1px;
+  left:50%;
+  width:56px;
+  height:2px;
+  margin-left:-28px;
+  border-radius:0 0 2px 2px;
+  background:var(--laranja, #ff7a1a);
 }
 
-.login-card .coi-wordmark{
-  margin:0 auto 10px;
-}
+.login-card .coi-wordmark{ margin:0 auto 10px; }
 
 .login-titulo{
-  text-align:center;
-  font-size:14.5px;
-  font-weight:600;
-  color: var(--text-secondary, #566072);
   margin:0 0 22px;
+  text-align:center;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  color:var(--text-muted, #73839e);
 }
 
 .login-view{ display:none; }
-.login-view.ativo{ display:block; }
+.login-view.ativo{ display:block; animation:fadeInModule .25s var(--ease, ease); }
+
+.login-view input{ height:40px; }
+.login-view textarea{ height:72px; }
 
 .login-erro,
 .login-sucesso{
   display:none;
+  margin-top:12px;
+  padding:9px 12px;
+  border-radius:var(--radius-sm, 7px);
   font-size:13px;
   font-weight:600;
-  padding:9px 12px;
-  border-radius: var(--radius-sm, 6px);
-  margin-top:12px;
 }
 .login-erro.mostrar,
 .login-sucesso.mostrar{ display:block; }
-
 .login-erro{
-  background: rgba(220,38,38,.1);
-  border:1px solid rgba(220,38,38,.3);
-  color: var(--danger, #dc2626);
+  background:rgba(239,68,68,.1);
+  border:1px solid rgba(239,68,68,.35);
+  color:#fca5a5;
 }
-
 .login-sucesso{
-  background: rgba(22,163,74,.1);
-  border:1px solid rgba(22,163,74,.3);
-  color: var(--success, #16a34a);
+  background:rgba(34,197,94,.1);
+  border:1px solid rgba(34,197,94,.32);
+  color:#86efac;
 }
 
 .login-links{
@@ -68,52 +89,120 @@
   justify-content:space-between;
   gap:8px;
   margin-top:16px;
-  font-size:12px;
+  font-size:12.5px;
 }
 .login-links a{
-  color: var(--accent, #0b5394);
+  color:var(--accent, #3b8cff);
   cursor:pointer;
   text-decoration:none;
   font-weight:600;
 }
-.login-links a:hover{ text-decoration:underline; }
+.login-links a:hover{ text-decoration:underline; text-underline-offset:3px; }
 
 .login-voltar{
   display:inline-block;
   margin-top:14px;
   font-size:12.5px;
-  color: var(--text-secondary, #566072);
-  cursor:pointer;
   font-weight:600;
+  color:var(--text-secondary, #a8b5cb);
+  cursor:pointer;
 }
-.login-voltar:hover{ color: var(--text, #1a2130); }
+.login-voltar:hover{ color:var(--text, #e8eef8); }
 
 .login-view button[type="button"]{
-  margin-top:16px;
+  height:42px;
+  margin-top:18px;
+  letter-spacing:.6px;
 }
 
-/* ===== BADGE DE USUÁRIO LOGADO (rodapé) ===== */
+/* ===== USUÁRIO LOGADO — barra superior =====
+   (antes ficava no rodapé; mesmos ids, js/auth.js alterna .mostrar) */
 .auth-usuario-badge{
   display:none;
   align-items:center;
-  gap:10px;
-  font-size:12px;
-  color: var(--texto-claro, rgba(255,255,255,.85));
+  gap:8px;
   flex-shrink:0;
+  padding:4px 4px 4px 5px;
+  background:rgba(14,24,41,.7);
+  border:1px solid var(--border, rgba(148,175,220,.12));
+  border-radius:999px;
 }
 .auth-usuario-badge.mostrar{ display:flex; }
 
-.auth-usuario-nome{ font-weight:600; }
-
-.auth-usuario-sair,
-.auth-usuario-perfil{
-  width:auto;
-  margin:0;
-  padding:5px 12px;
+.auth-usuario-avatar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  height:30px;
+  flex-shrink:0;
+  border-radius:50%;
   font-size:11.5px;
-  background: rgba(255,255,255,.12);
-  border:1px solid var(--borda-clara, rgba(255,255,255,.15));
+  font-weight:700;
+  letter-spacing:.4px;
   color:#fff;
+  background:linear-gradient(145deg, #1f6feb 0%, #0d3a8a 100%);
+  border:1px solid rgba(59,140,255,.5);
 }
-.auth-usuario-sair:hover,
-.auth-usuario-perfil:hover{ background: rgba(255,255,255,.2); }
+.auth-usuario-info{
+  display:flex;
+  flex-direction:column;
+  line-height:1.15;
+  padding-right:6px;
+  min-width:0;
+}
+.auth-usuario-nome{
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--text, #e8eef8);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:180px;
+}
+.auth-usuario-papel{
+  font-size:10.5px;
+  color:var(--text-muted, #73839e);
+  white-space:nowrap;
+}
+
+.auth-usuario-badge button.auth-usuario-sair,
+.auth-usuario-badge button.auth-usuario-perfil{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  width:auto;
+  height:30px;
+  margin:0;
+  padding:0 12px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--text-secondary, #a8b5cb);
+  background:transparent;
+  border:1px solid var(--border-strong, rgba(148,175,220,.22));
+  border-radius:999px;
+  box-shadow:none;
+}
+.auth-usuario-badge button svg{ width:14px; height:14px; flex-shrink:0; }
+.auth-usuario-badge button.auth-usuario-perfil:hover{
+  color:#fff;
+  background:var(--accent-soft, rgba(59,140,255,.13));
+  border-color:rgba(59,140,255,.45);
+  transform:none;
+}
+.auth-usuario-badge button.auth-usuario-sair:hover{
+  color:#fff;
+  background:rgba(239,68,68,.16);
+  border-color:rgba(239,68,68,.45);
+  transform:none;
+}
+
+@media (max-width:1100px){
+  .auth-usuario-papel{ display:none; }
+}
+@media (max-width:700px){
+  .auth-usuario-info{ display:none; }
+  .auth-usuario-badge button span{ display:none; }
+  .auth-usuario-badge button.auth-usuario-sair,
+  .auth-usuario-badge button.auth-usuario-perfil{ padding:0 9px; }
+}

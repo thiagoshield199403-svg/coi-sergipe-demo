@@ -1,82 +1,117 @@
-// FUNDO ANIMADO NATALINO — camada decorativa independente (ver css/fundo-natal.css).
-// Não depende de nenhum outro script nem altera nenhum módulo. Vídeo de 20 s em loop contínuo, sem áudio.
+// FUNDO NATALINO — camada decorativa independente (ver css/fundo-natal.css).
+// Não depende de nenhum outro script nem altera nenhum módulo.
 //
-// Escolha automática da versão:
-//   - sistema pede menos movimento (prefers-reduced-motion) ou economia de dados → imagem estática;
-//   - máquina com poucos recursos (≤ 4 núcleos ou ≤ 4 GB) ou tela pequena → vídeo 720p;
-//   - navegador decodifica VP9 → WebM 1080p (menor); senão → MP4 H.264 1080p.
-// O vídeo pausa quando a aba fica oculta e volta ao reabrir. Se o vídeo falhar, fica a imagem estática.
+// Fotografia estática do COI (assets/natal/fundo-coi-natal.png), com véu escuro e pequenos pontos de
+// luz posicionados sobre as lâmpadas reais do pisca-pisca da foto (varal acima dos monitores e algumas
+// lâmpadas da árvore). Só esses pontos piscam, suavemente, cada um no seu ritmo. A foto não se move.
+// Com prefers-reduced-motion as luzes ficam paradas (regra no CSS).
 //
 // Para desligar: FUNDO_NATAL_ATIVO = false abaixo, ou abrir a página com ?natal=0.
 
 const FUNDO_NATAL_ATIVO = true;
-const FUNDO_NATAL_PASTA = "assets/natal/";
 
-/** Decide a versão do fundo a partir das capacidades do navegador (função pura — testada em fundo-natal.test.js). */
-function fundoNatalEscolherFonte(amb) {
-  if (amb.reduzirMovimento) return {tipo: "imagem", motivo: "menos movimento"};
-  if (amb.economiaDados) return {tipo: "imagem", motivo: "economia de dados"};
-  const fraco = (amb.nucleos || 8) <= 4 || (amb.memoriaGB || 8) <= 4;
-  const telaPequena = amb.ladoMaiorPx < 1600;
-  if (fraco || telaPequena) {
-    return {tipo: "video", motivo: fraco ? "máquina com poucos recursos" : "tela pequena", fontes: [["natal-coi-720p.mp4", "video/mp4"]]};
-  }
-  const mp4 = ["natal-coi-1080p.mp4", "video/mp4"];
-  if (amb.vp9) return {tipo: "video", motivo: "VP9", fontes: [["natal-coi-1080p.webm", "video/webm"], mp4]};
-  return {tipo: "video", motivo: "H.264", fontes: [mp4]};
+/* Posição de cada lâmpada em % da fotografia (1672×941): [x, y, cor].
+   Cores: r = vermelho, g = verde, z = azul, a = amarelo, b = branco quente.
+   Coordenadas medidas na própria foto (centro de cada lâmpada acesa). */
+const FUNDO_NATAL_LUZES = [
+  // varal acima dos monitores
+  [27.30, 20.69, "r"],
+  [28.37, 21.39, "z"],
+  [29.37, 19.88, "r"],
+  [30.64, 20.54, "z"],
+  [32.30, 18.23, "g"],
+  [33.39, 20.22, "r"],
+  [34.46, 18.58, "r"],
+  [35.24, 18.63, "r"],
+  [35.34, 17.33, "r"],
+  [35.99, 19.74, "g"],
+  [36.89, 18.85, "r"],
+  [39.42, 18.91, "a"],
+  [41.01, 16.15, "b"],
+  [42.22, 18.44, "g"],
+  [45.16, 18.05, "r"],
+  [46.63, 14.92, "a"],
+  [47.46, 16.68, "b"],
+  [48.42, 15.75, "z"],
+  [50.09, 17.28, "a"],
+  [52.36, 13.48, "b"],
+  [52.79, 15.71, "a"],
+  [56.20, 15.19, "r"],
+  [57.98, 13.01, "g"],
+  [63.78, 13.90, "z"],
+  [65.84, 11.60, "g"],
+  [67.44, 13.57, "r"],
+  [70.73, 12.28, "r"],
+  [72.23, 10.73, "r"],
+  [73.29, 11.82, "b"],
+  [74.75, 9.88, "g"],
+  [76.15, 10.80, "r"],
+  [79.24, 11.05, "r"],
+  [80.14, 10.02, "r"],
+  [82.28, 10.09, "z"],
+  [84.86, 7.01, "a"],
+  [84.90, 8.53, "r"],
+  [87.02, 10.35, "b"],
+  [90.11, 6.34, "g"],
+  [91.90, 9.64, "r"],
+  [93.90, 6.97, "a"],
+  [96.88, 4.30, "r"],
+  [97.00, 5.97, "r"],
+  // �rvore (s� algumas l�mpadas, n�o a �rvore inteira)
+  [22.19, 40.83, "z"],
+  [21.70, 43.74, "b"],
+  [19.90, 44.00, "a"],
+  [23.39, 46.28, "b"],
+  [24.83, 50.26, "z"],
+  [19.01, 52.03, "a"],
+  [23.64, 52.96, "b"],
+  [21.24, 37.12, "r"],
+  [23.27, 38.34, "r"]
+];
+
+/** Ritmo de cada luz, determinístico pelo índice (função pura — testada em fundo-natal.test.js).
+    Durações de 2,4 s a 5,6 s, atrasos negativos (as luzes já começam em fases diferentes),
+    intensidade mínima e máxima variando um pouco de lâmpada para lâmpada. */
+function fundoNatalRitmo(i) {
+  // pseudoaleatório simples e estável (mesmo resultado em toda carga da página)
+  const r = (n) => {
+    const x = Math.sin((i + 1) * 12.9898 + n * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  };
+  const dur = 2.4 + r(1) * 3.2;
+  return {
+    dur: +dur.toFixed(2),
+    atraso: -+(r(2) * dur).toFixed(2),
+    min: +(0.03 + r(3) * 0.09).toFixed(2),
+    pico: +(0.90 + r(4) * 0.10).toFixed(2),
+  };
 }
 
 function fundoNatalIniciar() {
   if (!FUNDO_NATAL_ATIVO || new URLSearchParams(location.search).get("natal") === "0") return;
   if (document.querySelector(".natal-bg")) return;
 
-  const amb = {
-    reduzirMovimento: matchMedia("(prefers-reduced-motion: reduce)").matches,
-    economiaDados: !!(navigator.connection && navigator.connection.saveData),
-    nucleos: navigator.hardwareConcurrency,
-    memoriaGB: navigator.deviceMemory,
-    ladoMaiorPx: Math.max(screen.width, screen.height) * (devicePixelRatio || 1),
-    vp9: document.createElement("video").canPlayType('video/webm; codecs="vp9"') === "probably",
-  };
-  const escolha = fundoNatalEscolherFonte(amb);
-
   const camada = document.createElement("div");
   camada.className = "natal-bg";
   camada.setAttribute("aria-hidden", "true");
-  camada.dataset.versao = escolha.motivo;
 
-  if (escolha.tipo === "imagem") {
-    const img = document.createElement("img");
-    img.src = FUNDO_NATAL_PASTA + "natal-coi-poster.jpg";
-    img.alt = "";
-    camada.appendChild(img);
-  } else {
-    const video = document.createElement("video");
-    video.muted = true;
-    video.loop = true;
-    video.autoplay = true;
-    video.playsInline = true;
-    video.preload = "auto";
-    video.setAttribute("muted", "");
-    video.setAttribute("playsinline", "");
-    video.disablePictureInPicture = true;
-    video.poster = FUNDO_NATAL_PASTA + "natal-coi-poster-720.jpg";
-    let ultima = null;
-    for (const [arquivo, tipo] of escolha.fontes) {
-      ultima = document.createElement("source");
-      ultima.src = FUNDO_NATAL_PASTA + arquivo;
-      ultima.type = tipo;
-      video.appendChild(ultima);
-    }
-    // o navegador tenta as fontes em ordem; só quando a ÚLTIMA falha não há vídeo utilizável →
-    // fica apenas a imagem estática do CSS
-    ultima.addEventListener("error", () => video.remove());
-    camada.appendChild(video);
-    const tocar = () => video.play().catch(() => {});
-    document.addEventListener("visibilitychange", () => (document.hidden ? video.pause() : tocar()));
-    tocar();
-  }
+  const palco = document.createElement("div");
+  palco.className = "natal-palco";
 
+  FUNDO_NATAL_LUZES.forEach(([x, y, cor], i) => {
+    const ritmo = fundoNatalRitmo(i);
+    const luz = document.createElement("span");
+    luz.className = "natal-luz cor-" + cor;
+    luz.style.left = x + "%";
+    luz.style.top = y + "%";
+    luz.style.setProperty("--dur", ritmo.dur + "s");
+    luz.style.setProperty("--atraso", ritmo.atraso + "s");
+    luz.style.setProperty("--min", ritmo.min);
+    luz.style.setProperty("--pico", ritmo.pico);
+    palco.appendChild(luz);
+  });
+
+  camada.appendChild(palco);
   document.body.insertBefore(camada, document.body.firstChild);
   document.documentElement.classList.add("natal-ativo");
 }
@@ -86,4 +121,4 @@ if (typeof document !== "undefined") {
   else fundoNatalIniciar();
 }
 
-if (typeof module !== "undefined") module.exports = {fundoNatalEscolherFonte};
+if (typeof module !== "undefined") module.exports = {fundoNatalRitmo, FUNDO_NATAL_LUZES};

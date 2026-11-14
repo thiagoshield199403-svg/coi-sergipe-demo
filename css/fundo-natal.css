@@ -1,8 +1,10 @@
-/* ===== FUNDO ANIMADO NATALINO =====
+/* ===== FUNDO NATALINO =====
    Camada decorativa independente, criada por js/fundo-natal.js (só existe com a classe html.natal-ativo).
+   Fotografia estática do COI (assets/natal/fundo-coi-natal.png) + véu escuro + pequenos pontos de luz
+   sobrepostos às lâmpadas reais do pisca-pisca da foto. Só os pontos de luz são animados.
    Não altera nenhum módulo: fica ATRÁS de tudo com z-index:-1 (sem criar novo contexto de empilhamento no
    .app), então modais, rodapé e toasts mantêm a mesma ordem de sobreposição de antes.
-   Os cartões dos módulos (.container) continuam opacos — o fundo aparece só ao redor deles. */
+   Nada aqui recebe clique (pointer-events:none). */
 
 html.natal-ativo{
   background:#05080f;
@@ -19,30 +21,79 @@ html.natal-ativo body{
   z-index:-1;
   overflow:hidden;
   pointer-events:none;
-  background:#05080f url("../assets/natal/natal-coi-poster-720.jpg") center / cover no-repeat;
+  background:#05080f;
+  container-type:size; /* o palco abaixo se dimensiona pela área visível (cqw/cqh) */
 }
 
-.natal-bg video,
-.natal-bg img{
+/* "Palco" com a MESMA proporção da fotografia (1672×941), dimensionado como background-size:cover e
+   centralizado. Como as luzes são posicionadas em % do palco, elas ficam sempre exatamente sobre as
+   lâmpadas da foto, em qualquer tamanho de janela. */
+.natal-palco{
   position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
+  left:50%;
+  top:50%;
+  width:max(100cqw, calc(100cqh * 1672 / 941));
+  aspect-ratio:1672 / 941;
+  transform:translate(-50%, -50%);
+  background:url("../assets/natal/fundo-coi-natal.png") center / cover no-repeat;
 }
 
-/* véu escuro: reduz o contraste do fundo para não competir com os cartões e o texto */
-.natal-bg::after{
+/* véu escuro discreto: preserva a leitura da interface; as luzes ficam acima dele */
+.natal-palco::before{
   content:"";
   position:absolute;
   inset:0;
   background:
-    linear-gradient(90deg, rgba(4,8,16,.55) 0, rgba(4,8,16,.30) 40%, rgba(4,8,16,.30) 75%, rgba(4,8,16,.45) 100%);
+    linear-gradient(90deg, rgba(4,8,16,.58) 0, rgba(4,8,16,.42) 40%, rgba(4,8,16,.42) 75%, rgba(4,8,16,.52) 100%);
+}
+
+/* ---- pisca-pisca ----
+   Cada luz é um brilho pequeno (≈0,85% da largura da foto, o tamanho de uma lâmpada) somado à foto com
+   mix-blend-mode:screen. Só a opacidade é animada (barato: roda no compositor), com duração, atraso e
+   intensidade diferentes por luz, definidos por js/fundo-natal.js. Transições lentas: sem flash. */
+.natal-luz{
+  position:absolute;
+  width:1.25%;
+  aspect-ratio:1;
+  transform:translate(-50%, -50%);
+  border-radius:50%;
+  mix-blend-mode:screen;
+  background:radial-gradient(circle, var(--nucleo) 0, var(--nucleo) 12%, var(--cor) 30%, transparent 68%);
+  opacity:var(--min, .08);
+  animation:natal-piscar var(--dur, 3s) ease-in-out var(--atraso, 0s) infinite;
+  will-change:opacity;
+}
+/* halo suave em volta da lâmpada acesa (pisca junto, pois herda a opacidade da luz) */
+.natal-luz::after{
+  content:"";
+  position:absolute;
+  inset:-110%;
+  border-radius:50%;
+  background:radial-gradient(circle, var(--cor) 0, transparent 60%);
+  opacity:.45;
+}
+.natal-luz.cor-r{ --cor:rgba(255,50,40,.95);   --nucleo:rgba(255,215,205,1); }
+.natal-luz.cor-g{ --cor:rgba(50,240,100,.90);  --nucleo:rgba(215,255,225,1); }
+.natal-luz.cor-z{ --cor:rgba(60,125,255,.95);  --nucleo:rgba(215,230,255,1); }
+.natal-luz.cor-a{ --cor:rgba(255,200,30,.95);  --nucleo:rgba(255,245,200,1); }
+.natal-luz.cor-b{ --cor:rgba(255,212,150,.90); --nucleo:rgba(255,250,238,1); } /* branco quente */
+
+@keyframes natal-piscar{
+  0%, 100%{ opacity:var(--min, .08); }
+  40%, 65%{ opacity:var(--pico, 1); }
+}
+
+/* menos movimento: sem animação — as luzes ficam acesas, paradas, com intensidade média */
+@media (prefers-reduced-motion: reduce){
+  .natal-luz{
+    animation:none;
+    opacity:.7;
+  }
 }
 
 /* tela de login: o gradiente opaco vira um véu translúcido para a cena aparecer atrás do cartão */
 html.natal-ativo #login-screen{
-  background: linear-gradient(160deg, rgba(27,31,39,.55) 0%, rgba(6,47,87,.45) 100%);
+  background: linear-gradient(160deg, rgba(27,31,39,.50) 0%, rgba(6,47,87,.40) 100%);
 }
 
 /* ...mas a interface do sistema continua escondida atrás do login, como era com o fundo opaco.
@@ -52,12 +103,12 @@ html.natal-ativo body:has(#login-screen:not([style*="none"])) .footer-global{
   visibility:hidden;
 }
 
-/* com o sistema aberto, o vídeo ocupa só a ÁREA VISÍVEL (entre a barra lateral e o rodapé fixo), não a
-   janela inteira: assim ele é dimensionado para essa área e a cena aparece quase inteira, em vez de ter a
-   parte esquerda escondida atrás da barra lateral opaca (efeito de "zoom"). No login a tela cheia continua. */
+/* com o sistema aberto, o fundo ocupa só a ÁREA VISÍVEL (entre a barra lateral e o rodapé fixo), não a
+   janela inteira: assim a foto é enquadrada para essa área, em vez de ter a parte esquerda (a árvore)
+   escondida atrás da barra lateral opaca. No login a tela cheia continua. */
 html.natal-ativo body:has(#login-screen[style*="none"]) .natal-bg{
   left: var(--sidebar-width, 248px);
-  bottom: 52px; /* altura do .footer-global */
+  bottom: var(--footer-height, 52px); /* altura do .footer-global (token em styles.css) */
 }
 /* Gestão de Equipes (tela ampla) esconde a barra lateral; no celular ela fica em cima, não ao lado */
 html.natal-ativo body.modo-tela-ampla:has(#login-screen[style*="none"]) .natal-bg{

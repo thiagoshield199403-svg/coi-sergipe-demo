@@ -61,11 +61,19 @@ ou abrir em uma aba anônima.
   Substituição de Poste/Transformador) — geram texto de relatório localmente.
 - **Gestão de Equipes + Mapa Operacional** — funcional com dados **fictícios** (equipes,
   operadores, telefones, viaturas — nada real), incluindo cadastrar/editar/excluir equipe.
-- **Mapas das Regionais** — módulo territorial independente (Leaflet), usa os limites
-  municipais/distritais públicos do IBGE/OSM já presentes em `geodata/`. Quando uma
-  localidade não tem contorno próprio no GeoJSON, o módulo reaproveita o contorno do
-  MUNICÍPIO inteiro como aproximação (**fallback municipal**) — sinalizado visualmente por um
-  traço tracejado e um selo "nível municipal" (nunca escondido, nunca com posição inventada).
+- **Mapa Regional Interativo** (menu OPERAÇÃO) — único módulo de mapas das regionais: mapa
+  vetorial (SVG) das 5 regionais (Itabaiana, Lagarto, Glória, Propriá, Maruim — 58 municípios)
+  a partir da malha municipal oficial do IBGE em `geodata/`. Os 58 números dos polos ficam na base
+  estática `js/mapa-regional/dados.js` (associados pelo código IBGE) e aparecem assim que o
+  módulo abre: **no mapa, somente o número** (dentro do município, ou num selo externo com linha
+  indicadora nos pequenos); **na lista, no tooltip e no painel, "número — nome"** (o painel mostra
+  também a regional). O antigo "Mapas das Regionais" (Leaflet) foi removido.
+  **Expansão:** Regional Aracaju (001 Aracaju, 010 Barra dos Coqueiros, 020 Nossa Senhora do
+  Socorro), São Cristóvão (620) e Itaporanga d'Ajuda (código a confirmar), com bairros oficiais do
+  IBGE (Censo 2022) e localidades (IBGE 2010, pontos) em dois níveis: selecionar o município realça
+  todos os seus bairros; selecionar um bairro realça só ele. Nomes de bairros só na lista expansível,
+  no tooltip e no painel. Aproximação por roda do mouse, arrasto e botões. Fontes e limitações em
+  `geodata/ibge-2022/NOTICE.md`.
 - **Callback WhatsApp** — preenchimento manual de incidente e telefone; 23 mensagens prontas da
   Central Callback Web 1.1.0, agrupadas por assunto; abre direto o WhatsApp Web
   (`web.whatsapp.com/send`) em uma única aba nova. Não envia nada: o operador envia manualmente.
@@ -78,18 +86,17 @@ ou abrir em uma aba anônima.
 - **Escala** (menu GESTÃO) — apenas um link externo: abre a escala operacional
   (GitHub Pages) em nova aba. Não há tela local.
 
-## Fundo animado natalino
+## Fundo natalino
 
-Durante o período de Natal, a tela de login e a área ao redor dos módulos exibem uma cena 3D
-animada (sala de operação, bola de vidro com equipe de campo, árvore e torre de transmissão),
-em loop contínuo de 20 s, sem áudio e sem marcas ou textos. É só decoração: fica atrás de toda
-a interface e não altera nenhum módulo.
+Durante o período de Natal, a tela de login e a área ao redor dos módulos exibem uma fotografia
+estática do Centro de Operação Integrado decorado (árvore e pisca-piscas), com um véu escuro
+discreto para preservar a leitura. Só os pequenos pontos de luz do pisca-pisca piscam,
+suavemente e cada um no seu ritmo, posicionados sobre as lâmpadas reais da foto. É só decoração:
+fica atrás de toda a interface, não recebe cliques e não altera nenhum módulo.
 
-- Arquivos: `assets/natal/` (WebM VP9 e MP4 H.264 em 1080p, MP4 720p e imagens estáticas),
-  `css/fundo-natal.css` e `js/fundo-natal.js`.
-- Escolha automática: imagem estática se o sistema pedir menos movimento ou economia de dados;
-  720p em máquinas com poucos recursos ou telas pequenas; WebM quando o navegador suporta VP9,
-  senão MP4. O vídeo pausa com a aba oculta.
+- Arquivos: `assets/natal/fundo-coi-natal.png` (a fotografia, sem alterações),
+  `css/fundo-natal.css` e `js/fundo-natal.js` (posição/cor de cada lâmpada em `FUNDO_NATAL_LUZES`).
+- Com "reduzir movimento" ativado no sistema (`prefers-reduced-motion`), as luzes ficam paradas.
 - **Desligar:** `FUNDO_NATAL_ATIVO = false` em `js/fundo-natal.js` (ou abrir com `?natal=0`).
 
 ## Módulos pausados nesta demo
@@ -158,7 +165,7 @@ de backend nenhum:
 ```bash
 node js/equipes.test.js
 node js/mapa.test.js
-node js/mapas-regionais.test.js
+node js/mapa-regional.test.js
 node js/auth.test.js
 node js/callback-whatsapp.test.js
 node js/fundo-natal.test.js

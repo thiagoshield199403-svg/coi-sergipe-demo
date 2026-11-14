@@ -4,7 +4,7 @@
    blvMontarTexto (pura, sem DOM/Leaflet/fetch); blvGerarRelatorio/
    blvLimparRelatorio dependem de document real (getElementById,
    navigator.clipboard) e só são verificáveis manualmente no navegador —
-   mesmo padrão já estabelecido em js/mapa.test.js/js/mapas-regionais.test.js.
+   mesmo padrão já estabelecido em js/mapa.test.js/js/mapa-regional.test.js.
 
    Roda com Node puro:
        node js/scripts-campo/bloqueios.test.js
