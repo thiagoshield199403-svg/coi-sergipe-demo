@@ -166,6 +166,7 @@ de backend nenhum:
 node js/equipes.test.js
 node js/mapa.test.js
 node js/mapa-regional.test.js
+node js/publicacao.test.js
 node js/auth.test.js
 node js/callback-whatsapp.test.js
 node js/fundo-natal.test.js
@@ -176,3 +177,7 @@ node js/scripts-campo/sinergia.test.js
 node js/scripts-campo/substituicao-poste.test.js
 node js/scripts-campo/substituicao-transformador.test.js
 ```
+
+Antes de publicar (commit na `master` → GitHub Pages), rode `node ferramentas/versionar-recursos.js`:
+ele grava `?v=<hash>` em cada CSS/JS do `index.html`, para o navegador nunca misturar HTML novo com
+CSS antigo em cache (o Pages guarda CSS/JS por 10 minutos).

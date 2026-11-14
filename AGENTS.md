@@ -10,6 +10,8 @@ Internal operational tool for Energisa's COI (Centro de Operação Integrado) �
 
 There is no install or build step. Open `index.html` directly in a browser (or serve the folder with any static file server). All persistence is `localStorage`; there is no server component.
 
+**Publishing (GitHub Pages, served from `master` at `/coi-sergipe-demo/`): BEFORE every commit that changes any CSS/JS, run `node ferramentas/versionar-recursos.js`.** It rewrites every local CSS/JS reference in `index.html` to `file?v=<content hash>` (cache-busting). Pages serves assets with `Cache-Control: max-age=600`; without versions, on 14/11/2026 browsers combined the new `index.html` with the OLD cached `styles.css` and the line-icon SVGs (no CSS size) blew up to the full width (a "giant profile icon"). `js/publicacao.test.js` fails if any version is stale, a referenced file is missing, a root-absolute path (`/...`) appears, or the inline safety rule in `<head>` is gone: `:where(svg[viewBox="0 0 24 24"]:not([width])){width:1.25em;height:1.25em}` (zero specificity — module CSS still wins; it only keeps icons small if a stylesheet fails). Keep all paths relative. Tests that read `index.html` strip `?v=…` before checking content.
+
 There is no test suite or linter. To sanity-check an edit without a browser:
 - `node -c js/<file>.js` — validates JS syntax (catches broken template literals, stray tags pasted into a `.js` file, etc.)
 - A quick Node one-liner to confirm CSS brace balance after editing `styles.css` / `css/callback-whatsapp.css`, e.g. counting `{` vs `}` — useful because the CSS has no build step to catch a mismatched brace.

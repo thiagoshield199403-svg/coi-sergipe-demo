@@ -12,6 +12,8 @@ const path = require("node:path");
 const RAIZ = path.join(__dirname, "..");
 // fim de linha normalizado: no Windows (core.autocrlf) o checkout pode trazer CRLF
 const ler = rel => fs.readFileSync(path.join(RAIZ, rel), "utf8").replace(/\r\n/g, "\n");
+// index.html sem o ?v=<hash> de cache-busting (a versão é verificada em js/publicacao.test.js)
+const lerHtml = () => ler("index.html").replace(/\?v=[0-9a-f]+"/g, '"');
 const { MAPA_REGIONAL_DADOS: DADOS } = require("./mapa-regional/dados.js");
 const { MAPA_REGIONAL_GEOMETRIA: GEO } = require("./mapa-regional/geometria.js");
 const { MAPA_REGIONAL_GEOMETRIA_EXPANSAO: GEOX } = require("./mapa-regional/geometria-expansao.js");
@@ -447,7 +449,7 @@ teste("nenhum resquício da importação no módulo, no CSS e no HTML", () => {
   const proibidos = /Importar códigos|mr_codigos|mr-codigos|Restrito|restrito|cadeado|CADEADO|mrImportar|mrValidarArquivo|mrCodigos|mrSessao|sessionStorage|localStorage|FileReader|type="file"|\.files\b|Manter até fechar|Limpar códigos|PEND\.|pendente/;
   ["js/mapa-regional.js", "js/mapa-regional/dados.js", "css/mapa-regional.css"].forEach(f =>
     assert.ok(!proibidos.test(ler(f)), f + ": " + (ler(f).match(proibidos) || [])[0]));
-  const html = ler("index.html");
+  const html = lerHtml();
   const modulo = html.slice(html.indexOf('<div id="mapa_regional_interativo"'), html.indexOf("<!-- ///////////////CALLBACK WHATSAPP"));
   assert.ok(modulo.length > 100 && !proibidos.test(modulo));
 });
@@ -459,7 +461,7 @@ teste("arquivos do módulo não usam fetch / XMLHttpRequest / import / console (
     assert.ok(!/\bfetch\s*\(|XMLHttpRequest|^\s*import\s|console\.(log|info|warn|error|debug)/m.test(ler(f)), f));
 });
 teste("index.html carrega dados → geometria → expansão → subdivisões → controlador, nessa ordem, e o CSS", () => {
-  const html = ler("index.html");
+  const html = lerHtml();
   const pos = ["js/mapa-regional/dados.js", "js/mapa-regional/geometria.js", "js/mapa-regional/geometria-expansao.js", "js/mapa-regional/subdivisoes.js", "js/mapa-regional.js"]
     .map(s => html.indexOf('<script src="' + s + '"></script>'));
   pos.forEach(p => assert.ok(p > 0));
@@ -470,12 +472,12 @@ teste("index.html carrega dados → geometria → expansão → subdivisões →
 
 console.log("=== MÓDULO ANTIGO REMOVIDO / OUTROS MÓDULOS PRESERVADOS ===");
 teste("o antigo 'Mapas das Regionais' (Leaflet) não está no menu, no Início nem no HTML", () => {
-  const html = ler("index.html");
+  const html = lerHtml();
   assert.ok(!/mapas_territoriais|mapas_regionais|regtm|mapas-regionais/.test(html));
   ["js/mapas-regionais.js", "css/mapas-regionais.css", "js/mapas-regionais.test.js"].forEach(f => assert.ok(!fs.existsSync(path.join(RAIZ, f))));
 });
 teste("um único mapa regional no menu: 'Mapa Regional Interativo' (e o atalho do Início aponta para ele)", () => {
-  const html = ler("index.html");
+  const html = lerHtml();
   const rotulos = [...html.matchAll(/<span class="menu-label">([^<]+)<\/span>/g)].map(m => m[1]);
   assert.deepEqual(rotulos.filter(t => /mapa/i.test(t) && /regiona/i.test(t)), ["Mapa Regional Interativo"]);
   assert.ok(html.includes(`data-atalho="openModule('mapa_regional_interativo'"`));
@@ -486,7 +488,7 @@ teste("Mapa Operacional (Gestão de Equipes): geodata/aracaju (OpenStreetMap) in
   assert.ok(/geodata\/\$\{slug\}\/\$\{slug\}\.geojson/.test(ler("js/mapa.js")));
 });
 teste("nenhuma referência quebrada: todo script/CSS local do index.html existe; nenhum JS chama o módulo antigo", () => {
-  const html = ler("index.html");
+  const html = lerHtml();
   const locais = [...html.matchAll(/(?:src|href)="([^"#:]+\.(?:js|css))"/g)].map(m => m[1]);
   assert.ok(locais.length > 10);
   locais.forEach(f => assert.ok(fs.existsSync(path.join(RAIZ, f)), "arquivo ausente: " + f));
@@ -494,7 +496,7 @@ teste("nenhuma referência quebrada: todo script/CSS local do index.html existe;
     .forEach(f => assert.ok(!/\bregtm[A-Z_]/.test(fs.readFileSync(path.join(RAIZ, "js", f), "utf8")), f));
 });
 teste("outros módulos preservados: telas e itens de menu continuam no HTML", () => {
-  const html = ler("index.html");
+  const html = lerHtml();
   ["equipes", "callback", "bloqueios_lv", "substituicao_poste", "material_removido", "inicio"].forEach(id =>
     assert.ok(html.includes('id="' + id + '"'), "tela " + id));
   ["openModule('equipes', this); equipesAoAbrir();", "openModule('bloqueios_lv', this)", "openModule('substituicao_poste', this)",

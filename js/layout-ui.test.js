@@ -7,7 +7,8 @@ const path = require("node:path");
 const { layoutIniciais, layoutTituloModulo } = require("./layout-ui.js");
 
 const RAIZ = path.join(__dirname, "..");
-const html = fs.readFileSync(path.join(RAIZ, "index.html"), "utf8");
+// ?v=<hash> (cache-busting, ferramentas/versionar-recursos.js) é ignorado nas checagens de conteúdo
+const html = fs.readFileSync(path.join(RAIZ, "index.html"), "utf8").replace(/\?v=[0-9a-f]+"/g, '"');
 let ok = 0;
 function teste(nome, fn) {
   try { fn(); ok++; console.log("✓ " + nome); }
