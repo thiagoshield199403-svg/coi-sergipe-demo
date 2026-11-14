@@ -61,11 +61,19 @@ ou abrir em uma aba anônima.
   Substituição de Poste/Transformador) — geram texto de relatório localmente.
 - **Gestão de Equipes + Mapa Operacional** — funcional com dados **fictícios** (equipes,
   operadores, telefones, viaturas — nada real), incluindo cadastrar/editar/excluir equipe.
-- **Mapas das Regionais** — módulo territorial independente (Leaflet), usa os limites
-  municipais/distritais públicos do IBGE/OSM já presentes em `geodata/`. Quando uma
-  localidade não tem contorno próprio no GeoJSON, o módulo reaproveita o contorno do
-  MUNICÍPIO inteiro como aproximação (**fallback municipal**) — sinalizado visualmente por um
-  traço tracejado e um selo "nível municipal" (nunca escondido, nunca com posição inventada).
+- **Mapa Regional Interativo** (menu OPERAÇÃO) — único módulo de mapas das regionais: mapa
+  vetorial (SVG) das 5 regionais (Itabaiana, Lagarto, Glória, Propriá, Maruim — 58 municípios)
+  a partir da malha municipal oficial do IBGE em `geodata/`. Os 58 números dos polos ficam na base
+  estática `js/mapa-regional/dados.js` (associados pelo código IBGE) e aparecem assim que o
+  módulo abre: **no mapa, somente o número** (dentro do município, ou num selo externo com linha
+  indicadora nos pequenos); **na lista, no tooltip e no painel, "número — nome"** (o painel mostra
+  também a regional). O antigo "Mapas das Regionais" (Leaflet) foi removido.
+  **Expansão:** Regional Aracaju (001 Aracaju, 010 Barra dos Coqueiros, 020 Nossa Senhora do
+  Socorro), São Cristóvão (620) e Itaporanga d'Ajuda (código a confirmar), com bairros oficiais do
+  IBGE (Censo 2022) e localidades (IBGE 2010, pontos) em dois níveis: selecionar o município realça
+  todos os seus bairros; selecionar um bairro realça só ele. Nomes de bairros só na lista expansível,
+  no tooltip e no painel. Aproximação por roda do mouse, arrasto e botões. Fontes e limitações em
+  `geodata/ibge-2022/NOTICE.md`.
 - **Callback WhatsApp** — preenchimento manual de incidente e telefone; 23 mensagens prontas da
   Central Callback Web 1.1.0, agrupadas por assunto; abre direto o WhatsApp Web
   (`web.whatsapp.com/send`) em uma única aba nova. Não envia nada: o operador envia manualmente.
@@ -157,7 +165,7 @@ de backend nenhum:
 ```bash
 node js/equipes.test.js
 node js/mapa.test.js
-node js/mapas-regionais.test.js
+node js/mapa-regional.test.js
 node js/auth.test.js
 node js/callback-whatsapp.test.js
 node js/fundo-natal.test.js

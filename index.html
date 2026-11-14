@@ -23,9 +23,8 @@
 <link rel="stylesheet" href="css/admin.css">
 <link rel="stylesheet" href="css/equipes.css">
 <link rel="stylesheet" href="css/mapa.css">
-<!-- MAPAS DAS REGIONAIS: módulo novo e independente (não reaproveita
-     classes de css/mapa.css) — ver css/mapas-regionais.css. -->
-<link rel="stylesheet" href="css/mapas-regionais.css">
+<!-- MAPA REGIONAL INTERATIVO (SVG, único módulo de mapas regionais) — ver css/mapa-regional.css. -->
+<link rel="stylesheet" href="css/mapa-regional.css">
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup
      (Bloqueio LV, e futuramente Trafo/Poste/Sinergia/Desarme/SS) — ver
      css/scripts-campo.css. -->
@@ -174,14 +173,11 @@
           <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
           <span class="menu-label">Gestão de Equipes</span>
         </button>
-        <!-- Item antigo "Mapa Regionais" (galeria de imagens estáticas,
-             módulo #mapas_regionais) removido do menu — substituído por este
-             módulo interativo. O HTML do módulo antigo (#mapas_regionais)
-             permanece no arquivo por enquanto, só sem nenhum botão de menu
-             apontando pra ele; nenhuma limpeza/remoção de código nesta etapa. -->
-        <button onclick="openModule('mapas_territoriais', this); regtmAoAbrir();">
-          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/><circle cx="12" cy="9" r="2"/></svg>
-          <span class="menu-label">Mapas das Regionais</span>
+        <!-- MAPA REGIONAL INTERATIVO: único módulo de mapas das regionais (o antigo
+             "Mapas das Regionais", Leaflet, foi removido) — ver js/mapa-regional.js. -->
+        <button onclick="openModule('mapa_regional_interativo', this); mapaRegionalAoAbrir();">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 20.5 7 20.5 17 12 22 3.5 17 3.5 7 12 2"/><polyline points="3.5 7 12 12 20.5 7"/><line x1="12" y1="12" x2="12" y2="22"/></svg>
+          <span class="menu-label">Mapa Regional Interativo</span>
         </button>
       </div>
     </div>
@@ -404,10 +400,10 @@
           <span class="inicio-atalho-titulo">Gestão de Equipes</span>
           <span class="inicio-atalho-desc">Equipes do dia por polo, status e mapa operacional.</span>
         </button>
-        <button type="button" class="inicio-atalho" data-atalho="openModule('mapas_territoriais'">
+        <button type="button" class="inicio-atalho" data-atalho="openModule('mapa_regional_interativo'">
           <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
-          <span class="inicio-atalho-titulo">Mapas das Regionais</span>
-          <span class="inicio-atalho-desc">Territórios e municípios de cada regional.</span>
+          <span class="inicio-atalho-titulo">Mapa Regional Interativo</span>
+          <span class="inicio-atalho-desc">Os 58 municípios das 5 regionais, com número operacional.</span>
         </button>
         <button type="button" class="inicio-atalho" data-atalho="openModule('callback'">
           <span class="inicio-atalho-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></span>
@@ -1329,61 +1325,44 @@
     </div>
   </div>
 
-  <!-- =====///////////////// MAPAS REGIONAIS/////////////////// =====
-       Módulo já sem nenhum botão de menu apontando pra ele desde antes
-       desta demo (ver comentário na categoria "Operação" acima). VERSÃO
-       DEMONSTRATIVA: as 5 imagens originais (mapas/mapa1.jpg a mapa5.jpg)
-       continham códigos de despacho operacional reais por município —
-       deletadas desta cópia; conteúdo substituído pelo placeholder abaixo
-       em vez de deixar <img> quebradas apontando para arquivos removidos. -->
-<div id="mapas_regionais" class="module">
-  <div class="container">
-    <h2>Material operacional interno removido da versão demonstrativa.</h2>
-    <p class="texto-sub">
-      Este módulo exibia mapas com códigos de despacho operacional internos reais e foi
-      removido desta cópia pública por segurança.
-    </p>
-  </div>
-</div>
-
-
-<!-- =====///////////////// MAPAS DAS REGIONAIS (novo, independente) /////////////////// =====
-     Etapa 1 — esqueleto: seletor de Polo/Regional (sem carregar GeoJSON
-     ainda), área reservada do mapa (segunda instância Leaflet própria,
-     ver js/mapas-regionais.js) e painel lateral reservado para a futura
-     legenda/informações territoriais. Nenhuma classe/id daqui é
-     compartilhada com o Mapa Operacional da Gestão de Equipes. -->
-<div id="mapas_territoriais" class="module">
-  <div class="container">
-
-    <h2>Mapas das Regionais</h2>
-
-    <div class="regtm-topo">
-      <div class="regtm-campo-seletor">
-        <label for="regtm_select_polo">Regional / Polo</label>
-        <select id="regtm_select_polo" class="regtm-select">
-          <option value="">Selecione uma regional</option>
-        </select>
+<!-- =====///////////////// MAPA REGIONAL INTERATIVO /////////////////// =====
+     Único módulo de mapas das regionais (substituiu o antigo "Mapas das
+     Regionais" em Leaflet, removido).
+     Mapa vetorial (SVG) das 5 regionais a partir da malha oficial do IBGE
+     (geodata/ → ferramentas/gerar-mapa-regional.js → js/mapa-regional/geometria.js).
+     Abas, mapa, lista e painel são montados por js/mapa-regional.js. Os
+     números dos polos vêm da base estática js/mapa-regional/dados.js e
+     aparecem assim que o módulo abre: no mapa SOMENTE o número; na lista,
+     no tooltip e no painel "número — nome". -->
+<div id="mapa_regional_interativo" class="module">
+  <div class="container" id="mr_raiz">
+    <div class="mr-cabecalho">
+      <div>
+        <h2>Mapa Regional Interativo</h2>
+        <p class="texto-sub">Malha municipal oficial do IBGE · número do polo sobre cada município · passe o mouse para identificar, clique para selecionar.</p>
       </div>
-      <div class="regtm-selecao-indicador" id="regtm_selecao_indicador" data-regtm-vazio="true">
-        Nenhuma regional selecionada ainda.
-      </div>
+      <div class="mr-abas" role="tablist" aria-label="Regionais"></div>
     </div>
 
-    <div class="regtm-layout">
-      <div class="regtm-mapa-wrap">
-        <div id="mapas_territoriais_mapa" class="regtm-mapa"></div>
+    <div class="mr-layout">
+      <div class="mr-palco">
+        <div class="mr-tooltip" role="status" aria-live="polite"></div>
       </div>
 
-      <div class="regtm-painel-lateral" id="regtm_painel_lateral">
-        <h3>Legenda / Informações</h3>
-        <div class="regtm-painel-vazio">Reservado para a próxima etapa (legenda territorial e detalhes da localidade selecionada).</div>
-      </div>
+      <aside class="mr-painel">
+        <div class="mr-ficha mr-ficha-vazia"></div>
+        <div class="mr-legenda">
+          <div class="mr-legenda-cabecalho">
+            <span>Municípios</span>
+            <span class="mr-legenda-contagem"></span>
+          </div>
+          <ul class="mr-legenda-lista"></ul>
+        </div>
+      </aside>
     </div>
-
+    <p class="mr-rodape-fonte">Fonte dos limites: IBGE — malha territorial oficial (geodata/).</p>
   </div>
 </div>
-
 
 <!-- ///////////////CALLBACK WHATSAPP///////////////////////// -->
 <div id="callback" class="module">
@@ -2091,10 +2070,15 @@
 <script src="js/mensagens.js"></script>
 <script src="js/callback-whatsapp.js"></script>
 <script src="js/utilitarios.js"></script>
-<!-- MAPAS DAS REGIONAIS: módulo novo e independente, carregado depois de
-     js/mapa.js de propósito — não depende dele, só evita qualquer dúvida
-     de ordem (ver js/mapas-regionais.js). -->
-<script src="js/mapas-regionais.js"></script>
+<!-- MAPA REGIONAL INTERATIVO: base dos polos (códigos + IBGE), geometria
+     gerada do IBGE e controlador. Tudo por <script> — funciona em file://. -->
+<script src="js/mapa-regional/dados.js"></script>
+<script src="js/mapa-regional/geometria.js"></script>
+<!-- Expansão: Regional Aracaju, São Cristóvão e Itaporanga d'Ajuda — geometria (municípios,
+     bairros, pontos) e metadados das subdivisões, gerados de geodata/ibge-2022/. -->
+<script src="js/mapa-regional/geometria-expansao.js"></script>
+<script src="js/mapa-regional/subdivisoes.js"></script>
+<script src="js/mapa-regional.js"></script>
 <!-- CAMPO / OPERAÇÃO: geradores de script reintegrados do backup, um
      arquivo por ferramenta, cada um isolado (ver auditoria). -->
 <script src="js/scripts-campo/bloqueios.js"></script>

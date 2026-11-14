@@ -888,7 +888,7 @@ button.sec:hover{ background:#182844; border-color:rgba(148,175,220,.34); }
 .footer-sep{ color:var(--text-muted); margin:0 2px; }
 .footer-marca{ color:var(--accent); font-weight:600; letter-spacing:.6px; }
 
-/* ===== LEAFLET (Mapa Operacional e Mapas das Regionais) — só chrome do mapa =====
+/* ===== LEAFLET (Mapa Operacional da Gestão de Equipes) — só chrome do mapa =====
    leaflet.css carrega DEPOIS deste arquivo: por isso os seletores levam o
    prefixo .leaflet-container (especificidade maior que a do Leaflet). */
 html .leaflet-container{ font-family:var(--font-sans); background:var(--surface-alt); }

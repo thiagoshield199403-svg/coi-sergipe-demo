@@ -57,9 +57,8 @@
   function montarSeed() {
     // Nomes de polo/município/localidade abaixo são as 7 regionais REAIS já
     // presentes em geodata/ (fronteiras públicas do IBGE, já no projeto
-    // original) — mantidos aqui de propósito para que "Mapas das Regionais"
-    // (js/mapas-regionais.js, casamento por NOME normalizado com o GeoJSON,
-    // nunca por slug_geojson inventado aqui) funcione de verdade na demo.
+    // original) — mantidos aqui de propósito para que a Gestão de Equipes e o
+    // Mapa Operacional (js/equipes.js / js/mapa.js) funcionem de verdade na demo.
     // Nenhum dado abaixo além desses nomes de município é real: telefones,
     // viaturas, operadores e ocorrências (montados mais abaixo) são 100%
     // fictícios, criados só para esta demonstração.
