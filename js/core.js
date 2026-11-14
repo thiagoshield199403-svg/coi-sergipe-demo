@@ -32,7 +32,13 @@ function abrirMaterialRemovido(btn) {
  openModule('material_removido', btn);
 }
 
+// O relógio saiu da interface na modernização visual (rodapé só com a
+// assinatura). A função continua existindo e só atualiza se o elemento
+// voltar a existir — sem o elemento, não faz nada (evita erro a cada segundo).
 function atualizarRodape(){
+    const el = document.getElementById("dataHoraSistema");
+    if (!el) return;
+
     const agora = new Date();
 
     const data = agora.toLocaleDateString("pt-BR");
@@ -42,7 +48,7 @@ function atualizarRodape(){
         second: '2-digit'
     });
 
-    document.getElementById("dataHoraSistema").innerText = data + " " + hora;
+    el.innerText = data + " " + hora;
 }
 
 setInterval(atualizarRodape, 1000);

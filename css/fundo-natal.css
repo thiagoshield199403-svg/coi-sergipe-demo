@@ -108,7 +108,7 @@ html.natal-ativo body:has(#login-screen:not([style*="none"])) .footer-global{
    escondida atrás da barra lateral opaca. No login a tela cheia continua. */
 html.natal-ativo body:has(#login-screen[style*="none"]) .natal-bg{
   left: var(--sidebar-width, 248px);
-  bottom: 52px; /* altura do .footer-global */
+  bottom: var(--footer-height, 52px); /* altura do .footer-global (token em styles.css) */
 }
 /* Gestão de Equipes (tela ampla) esconde a barra lateral; no celular ela fica em cima, não ao lado */
 html.natal-ativo body.modo-tela-ampla:has(#login-screen[style*="none"]) .natal-bg{
