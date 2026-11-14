@@ -10,7 +10,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const RAIZ = path.join(__dirname, "..");
-const ler = rel => fs.readFileSync(path.join(RAIZ, rel), "utf8");
+// fim de linha normalizado: no Windows (core.autocrlf) o checkout pode trazer CRLF
+const ler = rel => fs.readFileSync(path.join(RAIZ, rel), "utf8").replace(/\r\n/g, "\n");
 const { MAPA_REGIONAL_DADOS: DADOS } = require("./mapa-regional/dados.js");
 const { MAPA_REGIONAL_GEOMETRIA: GEO } = require("./mapa-regional/geometria.js");
 const { MAPA_REGIONAL_GEOMETRIA_EXPANSAO: GEOX } = require("./mapa-regional/geometria-expansao.js");
